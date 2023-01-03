@@ -15,7 +15,7 @@ laps_driver = session.laps.pick_driver(driver)
 
 # Lap features
 lap_time = laps_driver['LapTime'] # Session time when the lap was set (End of lap).
-lap_numbers = laps_driver['LapNumber'] #  That's our temporal resolution T. It's effective lenght of one unit of time. 
+lap_numbers = laps_driver['LapNumber'] # That's our temporal resolution T. It's effective lenght of one unit of time. 
 
 # Tyre features
 tyre_life = laps_driver['TyreLife'] # Laps driven on this tyre. It includes laps in other session for used sets of tyre.
@@ -29,4 +29,10 @@ weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track
 # Create DataFrame
 list_of_tuples = list(zip(lap_time, lap_numbers, tyre_life, compound, stint, weather_rainfall, weather_track_temperature))
 df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Time', 'Compound', 'Tyre Life', 'Stint', 'Rainfall', 'Track Temp'])
-print(df.to_markdown())
+#print(df.to_markdown())
+
+# One-hot encode the categorical columns
+df_encoded = pd.get_dummies(df)
+
+# Convert the encoded dataframe to a NumPy Array
+array = df_encoded.to_numpy()
