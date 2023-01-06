@@ -46,10 +46,9 @@ def get_lap_times():
             lap_dict = {'driver': driver, 'lap': count ,'lap_time': lap}
             
             if pd.notnull(lap): # Value != NaT. The first lap is not in the dict. 
-                # Add the dictionary to the list
-                lap_time_data_dict.append(lap_dict)
+                lap_time_data_dict.append(lap_dict) # Add the dictionary to the list
             
-            # Update count
+            # Update count that it's the lap's number.
             count = count + 1 
                     
     return lap_time_data_dict
@@ -81,6 +80,13 @@ def choose_driver(lap_data_dict):
             
     return best_driver, best_lap_time
 
-lap_data = get_lap_times()
-best_lap = choose_driver(lap_data)
-print(best_lap)
+# Function returns all data for one specific given driver.
+def get_driver_data(lap_data_dict, driver):   
+    for driver_data in lap_data_dict:
+        if(driver == driver_data['driver']):
+            driver = driver_data['driver']
+    
+    for driver_data in lap_data_dict:
+        if driver_data.get('driver') == driver:
+            print(driver_data)
+                
