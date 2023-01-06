@@ -39,7 +39,8 @@ def get_lap_times():
     # Iterate over the tuples in the list
     for driver in drivers:
         # Get all lap time for the current driver
-        lap_time = laps_driver['LapTime']
+        session_driver = session.laps.pick_driver(driver)
+        lap_time = session_driver['LapTime']
         count = 0
         for lap in lap_time:    
             # Create a new dictionary for each tuple
@@ -81,12 +82,19 @@ def choose_driver(lap_data_dict):
     return best_driver, best_lap_time
 
 # Function returns all data for one specific given driver.
-def get_driver_data(lap_data_dict, driver):   
+def get_driver_data(lap_data_dict, driver):  
+    get_driver_data = []
+     
     for driver_data in lap_data_dict:
         if(driver == driver_data['driver']):
             driver = driver_data['driver']
     
     for driver_data in lap_data_dict:
         if driver_data.get('driver') == driver:
-            print(driver_data)
+            get_driver_data.append(driver_data)
+    
+    return get_driver_data
                 
+lap_data = get_lap_times() # Returns all lap time for each driver. It's a dictionary. 
+best_lap_time = choose_driver(lap_data) # Returns the best's lap of the grand prix and the driver. Purple lap. 
+get_driver_data(lap_data, 'LEC')
