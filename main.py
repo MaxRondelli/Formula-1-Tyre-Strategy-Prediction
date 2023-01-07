@@ -55,7 +55,7 @@ def get_lap_times():
     return lap_time_data_dict
 
 # Create DataFrame
-list_of_tuples = list(zip(lap_time, lap_numbers, tyre_life, compound, stint, weather_rainfall, weather_track_temperature))
+list_of_tuples = list(zip(lap_numbers, lap_time, compound, tyre_life , stint, weather_rainfall, weather_track_temperature))
 df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Time', 'Compound', 'Tyre Life', 'Stint', 'Rainfall', 'Track Temp'])
 
 # One-hot encode the categorical columns
@@ -78,13 +78,13 @@ def get_data_for_time(lap_data_dict, t):
 def get_driver_data(lap_data_dict, driver):  
     get_driver_data = []
      
-    for driver_data in lap_data_dict:
-        if(driver == driver_data['driver']):
-            driver = driver_data['driver']
+    for entry in lap_data_dict:
+        if(driver == entry['driver']):
+            driver = entry['driver']
     
-    for driver_data in lap_data_dict:
-        if driver_data.get('driver') == driver:
-            get_driver_data.append(driver_data)
+    for entry in lap_data_dict:
+        if entry.get('driver') == driver:
+            get_driver_data.append(entry)
     
     return get_driver_data
 
@@ -104,15 +104,15 @@ def get_best_driver(lap_data_dict):
     best_driver = lap_data_dict[0]['driver']
     best_lap_time = lap_data_dict[0]['lap_time']
 
-    for driver in lap_data_dict:
+    for entry in lap_data_dict:
         # If this driver's lap time is better than the best lap time of the current best driver, update the best driver.
-        if driver['lap_time'] < best_lap_time:
-            best_lap_time = driver['lap_time']
-            best_driver = driver['driver']
+        if entry['lap_time'] < best_lap_time:
+            best_lap_time = entry['lap_time']
+            best_driver = entry['driver']
             
-    return best_driver, best_lap_time
+    return best_driver
 
-# Function returns the driver withe the best lap time at time t, based on available data on driver lap times.  
+# Function returns the driver with the best lap time at time t, based on available data on driver lap times.  
 def get_best_driver_for_time(t):
     # Load data on driver lap times.
     lap_data = get_lap_times()
@@ -124,3 +124,21 @@ def get_best_driver_for_time(t):
     best_driver = get_best_driver(data_t)
     
     return best_driver
+
+# Function returns the compound of the driver how had the best time at t time. 
+def get_compound_for_time(t):   
+    driver = get_best_driver_for_time(t)  
+    
+    session_driver = session.laps.pick_driver(driver)
+    compound = session_driver['Compound']
+    
+    best_compound = 0 
+    
+    # It gets the compound at t time. 
+    for i, entry in enumerate(compound):
+        if i == t:
+            best_compound = entry
+            
+    return best_compound
+
+print(get_compound_for_time(61))
