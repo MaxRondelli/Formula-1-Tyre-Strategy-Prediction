@@ -64,22 +64,15 @@ df_encoded = pd.get_dummies(df)
 # Convert the encoded dataframe to a NumPy Array
 array = df_encoded.to_numpy()
 
-# ------ Create y output vector ------
-metric = lap_numbers # Determine the metric to use for choosing the best driver
-y = [] # Output vector 
-
-# Function choose driver with the best lap time among those available at t time, using the lap time data provided as input.
-def choose_driver(lap_data_dict):
-    best_driver = lap_data_dict[0]['driver']
-    best_lap_time = lap_data_dict[0]['lap_time']
-
-    for driver in lap_data_dict:
-        # If this driver's lap time is better than the best lap time of the current best driver, update the best driver.
-        if driver['lap_time'] < best_lap_time:
-            best_lap_time = driver['lap_time']
-            best_driver = driver['driver']
+# Function selects data on driver lap times at time t from the full lap time data. It returns information for all driver at the specific lap t. 
+def get_data_for_time(lap_data_dict, t):
+    data_t = [] # Empty list to store the selected data
+    
+    for entry in lap_data_dict:
+        if entry["lap"] == t:
+            data_t.append(entry)
             
-    return best_driver, best_lap_time
+    return data_t
 
 # Function returns all data for one specific given driver.
 def get_driver_data(lap_data_dict, driver):  
@@ -94,7 +87,40 @@ def get_driver_data(lap_data_dict, driver):
             get_driver_data.append(driver_data)
     
     return get_driver_data
-                
-lap_data = get_lap_times() # Returns all lap time for each driver. It's a dictionary. 
-best_lap_time = choose_driver(lap_data) # Returns the best's lap of the grand prix and the driver. Purple lap. 
-get_driver_data(lap_data, 'LEC')
+
+# Function returns all data for one specific driver at one time t.
+def get_driver_data_for_time(lap_data_dict, driver, t):
+    driver_data_t = []  
+    
+    for entry in lap_data_dict:
+        if entry['driver'] == driver:
+            if entry['lap'] == t:
+                driver_data_t.append(entry)
+    
+    return driver_data_t    
+
+# Function choose driver with the best lap time among those available at t time, using the lap time data provided as input.
+def get_best_driver(lap_data_dict):
+    best_driver = lap_data_dict[0]['driver']
+    best_lap_time = lap_data_dict[0]['lap_time']
+
+    for driver in lap_data_dict:
+        # If this driver's lap time is better than the best lap time of the current best driver, update the best driver.
+        if driver['lap_time'] < best_lap_time:
+            best_lap_time = driver['lap_time']
+            best_driver = driver['driver']
+            
+    return best_driver, best_lap_time
+
+# Function returns the driver withe the best lap time at time t, based on available data on driver lap times.  
+def get_best_driver_for_time(t):
+    # Load data on driver lap times.
+    lap_data = get_lap_times()
+    
+    # Select data on driver lap times at time t
+    data_t = get_data_for_time(lap_data, t)
+    
+    # Choose the driver with the best lap time among those available at time t
+    best_driver = get_best_driver(data_t)
+    
+    return best_driver
