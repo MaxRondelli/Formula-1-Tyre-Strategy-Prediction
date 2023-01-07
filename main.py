@@ -31,6 +31,16 @@ stint = laps_driver['Stint'] # Stint number
 weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
 weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
 
+# Create DataFrame
+list_of_tuples = list(zip(lap_numbers, lap_time, compound, tyre_life , stint, weather_rainfall, weather_track_temperature))
+df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Time', 'Compound', 'Tyre Life', 'Stint', 'Rainfall', 'Track Temp'])
+
+# One-hot encode the categorical columns
+df_encoded = pd.get_dummies(df)
+
+# Convert the encoded dataframe to a NumPy Array
+array = df_encoded.to_numpy()
+
 # Function returns all lap times for each lap for each driver
 def get_lap_times():
     lap_time_data_dict = [] # Create a list of dictionaries
@@ -53,16 +63,6 @@ def get_lap_times():
             count = count + 1 
                     
     return lap_time_data_dict
-
-# Create DataFrame
-list_of_tuples = list(zip(lap_numbers, lap_time, compound, tyre_life , stint, weather_rainfall, weather_track_temperature))
-df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Time', 'Compound', 'Tyre Life', 'Stint', 'Rainfall', 'Track Temp'])
-
-# One-hot encode the categorical columns
-df_encoded = pd.get_dummies(df)
-
-# Convert the encoded dataframe to a NumPy Array
-array = df_encoded.to_numpy()
 
 # Function selects data on driver lap times at time t from the full lap time data. It returns information for all driver at the specific lap t. 
 def get_data_for_time(lap_data_dict, t):
@@ -141,4 +141,4 @@ def get_compound_for_time(t):
             
     return best_compound
 
-print(get_compound_for_time(61))
+print(get_compound_for_time(21))
