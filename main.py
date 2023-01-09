@@ -5,22 +5,16 @@ import numpy as np
 # Enable the cache
 ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 
-def select_session(year, grand_prix, session_type):
-    session = ff1.get_session(year, grand_prix, session_type) 
-    return session
+session = ff1.get_session(2022, 'Imola', 'R')
+driver = 'VER'
+total_lap = 63 # That's our temporal resolution T. It's effective lenght of one unit of time.
 
-def select_driver(driver):
-    return driver
+session.load()
 
-session = select_session(2022, 'Austria', 'R')
-driver = select_driver('VER')  
-
-session.load() # Load the session
- 
 # Lap features
 laps_driver = session.laps.pick_driver(driver) 
 lap_time = laps_driver['LapTime'] # Session time when the lap was set (End of lap) for the specific driver. 
-lap_numbers = laps_driver['LapNumber'].to_numpy() # That's our temporal resolution T. It's effective lenght of one unit of time. 
+lap_numbers = laps_driver['LapNumber'] # Driver's lap
 
 # Tyre features
 tyre_life = laps_driver['TyreLife'] # Laps driven on this tyre. It includes laps in other session for used sets of tyre.
@@ -139,6 +133,6 @@ def get_compound_for_time(t):
         if i == t:
             best_compound = entry
             
-    return best_compound
+    return f"Driver: {driver} - Compound: {best_compound}"
 
 print(get_compound_for_time(21))
