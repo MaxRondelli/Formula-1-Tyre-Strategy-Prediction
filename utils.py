@@ -6,7 +6,6 @@ import numpy as np
 # Function returns all lap times for each lap for each driver
 def get_lap_times(session):
     lap_time_data_dict = [] # Create a list of dictionaries
-    print(type(session))
     drivers = pd.unique(session.laps['Driver']) # Array of all drivers
 
     # Iterate over the tuples in the list
@@ -105,7 +104,7 @@ def get_compound_for_time(session, t):
     return f"Driver: {driver} - Compound: {best_compound}"
 
 
-def get_data(driver, session):
+def get_data(driver, race_list, session):
     # Creare sessione per race -> race = ff1.get_session(2022, 'Imola', 'R')
     # session_driver = race.laps.pick_driver(driver) 
     # Creare dataframe seguendo quello fatto nel main. 
@@ -113,7 +112,26 @@ def get_data(driver, session):
     # Il numero di giri di get_data dipende dal numero di giri del driver, quindi laps_driver['LapNumber']
     
     # return df 
-    pass 
+    
+    for race in race_list:
+        session = ff1.get_session(2022, race, 'R')
+        session.load()
+    
+    session_driver = session.laps.pick_driver(driver)
+
+    driver_lap_number = session_driver['LapNumber'] # Driver's lap
+    driver_sector1_time = session_driver['Sector1Time'] # Sector 1 recorded time
+    driver_sector2_time = session_driver['Sector2Time'] # Sector 2 recorded time
+    driver_sector3_time = session_driver['Sector3Time'] # Sector 3 recorded time
+    driver_lap_time = session_driver['LapTime'] # Session time when the lap was set (End of lap) for the specific driver. 
+    weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
+    weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
+    
+    list_of_tuples = list(zip(driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
+    df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp'])
+    
+    print(df)
+    return df 
     
 
 def generate_df(race_list):
@@ -131,17 +149,37 @@ def generate_df(race_list):
             A data bisogna aggiungere due colonne all'inizio chiamate driver e race contenenti tante copie quante
             righe ha data tutte uguali con valore il nome del driver e race attuale.
             
-            - creare un df nuovo con lo stesso numero di righe di data e due colonne, driver e race a valore k. 
+            - creare un df nuovo con lo stesso numero di righe di data e due colonne, driver e race a valore costante. 
             - data = pd.Concatenazione_Orizzonatale(df, data)
             
             sempre dentro il ciclo di driver, bisogna concatenare in verticale il df data appena aggiornato 
             con il dataframe finale che viene inizializzato sopra. 
             
-            final_df = pd.Concatenazione_Verticale(final_df, data)
-            
-            
+            final_df = pd.Concatenazione_Verticale(final_df, data)         
     return final_df       
     '''
-    pass
+    
+    final_df = pd.DataFrame(columns = ['Driver', 'Race'])    
+    for race_name in race_list:
+        session = ff1.get_session(2022, race_name, 'R')
+        session.load()
+        driver_list = pd.unique(session.laps['Driver']) # Array of all drivers
+
+        for driver in driver_list:
+            data = get_data(driver, race_list, session)
+            
+            # Add to the final_df all features columns names from data dataframe. 
+            data_columns = data.columns.values.tolist()
+            final_df[data_columns] = None
+            
+            tmp_df = pd.DataFrame(index = data.index, columns = ['Driver', 'Race'])
+            tmp_df['Driver'] = driver 
+            tmp_df['Race'] = race_name   
+            
+            data = pd.concat([data, tmp_df], axis = 1)         
+            
+            final_df = pd.concat([final_df, data], axis = 0)
+    
+    return final_df
 
     
