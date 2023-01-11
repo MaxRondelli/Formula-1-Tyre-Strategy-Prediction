@@ -42,6 +42,6 @@ ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 lanciare nel main genearete_df sulla lista dei tracciati (tutti) e salvare output con la libreria pandas. (save.csv)
 '''
 
-race_list = ['Imola']
+race_list = ['Imola', 'Monza']
 mwe_dataframe = generate_df(race_list)
 mwe_dataframe.to_csv('mwe_dataframe.csv')

@@ -104,19 +104,7 @@ def get_compound_for_time(session, t):
     return f"Driver: {driver} - Compound: {best_compound}"
 
 
-def get_data(driver, race_list, session):
-    # Creare sessione per race -> race = ff1.get_session(2022, 'Imola', 'R')
-    # session_driver = race.laps.pick_driver(driver) 
-    # Creare dataframe seguendo quello fatto nel main. 
-    
-    # Il numero di giri di get_data dipende dal numero di giri del driver, quindi laps_driver['LapNumber']
-    
-    # return df 
-    
-    for race in race_list:
-        session = ff1.get_session(2022, race, 'R')
-        session.load()
-    
+def get_data(driver, session):
     session_driver = session.laps.pick_driver(driver)
 
     driver_lap_number = session_driver['LapNumber'] # Driver's lap
@@ -130,13 +118,13 @@ def get_data(driver, race_list, session):
     list_of_tuples = list(zip(driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
     df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp'])
     
-    print(df)
+    #print(df)
     return df 
     
 
 def generate_df(race_list):
     '''
-    race_list è una lista con i nomi di tutta le gare --> race_list = ['Imola', 'Monza', ....]
+    race_list è una lista con i nomi di tutta le gare --> race_list = ['Imola', 'Monza', ...]
     final_df = pd.DataFrame(columns = ['Driver, Race, le stesse colonne di get_data()'])
     
     for race_name in race_list:
@@ -159,27 +147,28 @@ def generate_df(race_list):
     return final_df       
     '''
     
-    final_df = pd.DataFrame(columns = ['Driver', 'Race'])    
+    final_df = pd.DataFrame()    
     for race_name in race_list:
         session = ff1.get_session(2022, race_name, 'R')
         session.load()
         driver_list = pd.unique(session.laps['Driver']) # Array of all drivers
 
         for driver in driver_list:
-            data = get_data(driver, race_list, session)
-            
-            # Add to the final_df all features columns names from data dataframe. 
-            data_columns = data.columns.values.tolist()
-            final_df[data_columns] = None
-            
+            data = get_data(driver, session)
+
             tmp_df = pd.DataFrame(index = data.index, columns = ['Driver', 'Race'])
             tmp_df['Driver'] = driver 
             tmp_df['Race'] = race_name   
             
             data = pd.concat([data, tmp_df], axis = 1)         
             
-            final_df = pd.concat([final_df, data], axis = 0)
+            final_df = pd.concat([final_df, data], ignore_index=True)
+                
+    columns = final_df.columns.tolist()
+    columns.remove('Driver')
+    columns.remove('Race')
     
+    final_df = final_df[['Driver', 'Race'] + columns]
     return final_df
 
     
