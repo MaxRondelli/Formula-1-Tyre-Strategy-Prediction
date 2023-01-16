@@ -1,7 +1,7 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
-
+from datetime import datetime, timedelta
 
 # Function returns all lap times for each lap for each driver
 def get_lap_times(session):
@@ -107,18 +107,19 @@ def get_compound_for_time(session, t):
 def get_data(driver, session):
     session_driver = session.laps.pick_driver(driver)
 
-    driver_lap_number = session_driver['LapNumber'] # Driver's lap
-    driver_sector1_time = session_driver['Sector1Time'] # Sector 1 recorded time
-    driver_sector2_time = session_driver['Sector2Time'] # Sector 2 recorded time
-    driver_sector3_time = session_driver['Sector3Time'] # Sector 3 recorded time
-    driver_lap_time = session_driver['LapTime'] # Session time when the lap was set (End of lap) for the specific driver. 
+    driver_lap_number = session_driver['LapNumber'] # Driver's lap  
+
+    driver_sector1_time = (session_driver['Sector1Time'] / np.timedelta64(1, 's')).astype(float) # Sector 1 recorded time
+    driver_sector2_time = (session_driver['Sector2Time'] / np.timedelta64(1, 's')).astype(float) # Sector 2 recorded time
+    driver_sector3_time = (session_driver['Sector3Time'] / np.timedelta64(1, 's')).astype(float) # Sector 3 recorded time
+    driver_lap_time = (session_driver['LapTime'] / np.timedelta64(1, 's')).astype(float) # Lap Time recorded time
+    
     weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
     weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
     
     list_of_tuples = list(zip(driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
     df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp'])
     
-    #print(df)
     return df 
     
 
@@ -170,5 +171,3 @@ def generate_df(race_list):
     
     final_df = final_df[['Driver', 'Race'] + columns]
     return final_df
-
-    
