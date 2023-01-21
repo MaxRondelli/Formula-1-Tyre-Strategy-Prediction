@@ -1,6 +1,7 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
+import xarray as xr
 from datetime import datetime, timedelta
 
 # Function returns all lap times for each lap for each driver
@@ -115,13 +116,14 @@ def get_data(driver, session):
     driver_lap_time = (session_driver['LapTime'] / np.timedelta64(1, 's')).astype(float) # Lap Time recorded time
     
     weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
-    weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
+    weather_rainfall = np.where(weather_rainfall == True, 1, 0)
     
+    weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
+ 
     list_of_tuples = list(zip(driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
     df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp'])
     
-    return df 
-    
+    return df     
 
 def generate_df(race_list):
     '''
@@ -148,26 +150,47 @@ def generate_df(race_list):
     return final_df       
     '''
     
-    final_df = pd.DataFrame()    
+    # final_df = pd.DataFrame()    
+    # for race_name in race_list:
+    #     session = ff1.get_session(2022, race_name, 'R')
+    #     session.load()
+    #     driver_list = pd.unique(session.laps['Driver']) # Array of all drivers
+
+    #     for driver in driver_list:
+    #         data = get_data(driver, session)
+
+    #         tmp_df = pd.DataFrame(index = data.index, columns = ['Driver', 'Race'])
+    #         tmp_df['Driver'] = driver 
+    #         tmp_df['Race'] = race_name   
+            
+    #         data = pd.concat([data, tmp_df], axis = 1)         
+            
+    #         final_df = pd.concat([final_df, data], ignore_index=True)
+                
+    # columns = final_df.columns.tolist()
+    # columns.remove('Driver')
+    # columns.remove('Race')
+    
+    # final_df = final_df[['Driver', 'Race'] + columns]
+    
+    # if final_df.empty:
+    #     print("final_df is empty. Returning None")
+    #     return None
+    # else:
+    #     final_array = final_df.values
+    #     final_array = final_array.reshape(-1, len(driver_list), len(race_list), len(columns))
+    
+    # print(final_array.ndim)
+    # return final_array
+    
+    driver_race_data = {}
     for race_name in race_list:
         session = ff1.get_session(2022, race_name, 'R')
         session.load()
-        driver_list = pd.unique(session.laps['Driver']) # Array of all drivers
-
+        driver_list = pd.unique(session.laps['Driver'])
+        
         for driver in driver_list:
             data = get_data(driver, session)
+            driver_race_data[(driver, race_name)] = data.values
 
-            tmp_df = pd.DataFrame(index = data.index, columns = ['Driver', 'Race'])
-            tmp_df['Driver'] = driver 
-            tmp_df['Race'] = race_name   
-            
-            data = pd.concat([data, tmp_df], axis = 1)         
-            
-            final_df = pd.concat([final_df, data], ignore_index=True)
-                
-    columns = final_df.columns.tolist()
-    columns.remove('Driver')
-    columns.remove('Race')
-    
-    final_df = final_df[['Driver', 'Race'] + columns]
-    return final_df
+    return driver_race_data
