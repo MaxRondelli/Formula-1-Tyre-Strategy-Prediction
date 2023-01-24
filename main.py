@@ -43,6 +43,6 @@ lanciare nel main genearete_df sulla lista dei tracciati (tutti) e salvare outpu
 '''
 grand_prix_list = ff1.get_event_schedule(2022)
 race_list = ['Imola'] #grand_prix_list['Location']
-array = generate_df(race_list)
+array = generate_array(race_list)
 
 print(array)

@@ -107,9 +107,8 @@ def get_compound_for_time(session, t):
 
 def get_data(driver, session):
     session_driver = session.laps.pick_driver(driver)
-
+    
     driver_lap_number = session_driver['LapNumber'] # Driver's lap  
-
     driver_sector1_time = (session_driver['Sector1Time'] / np.timedelta64(1, 's')).astype(float) # Sector 1 recorded time
     driver_sector2_time = (session_driver['Sector2Time'] / np.timedelta64(1, 's')).astype(float) # Sector 2 recorded time
     driver_sector3_time = (session_driver['Sector3Time'] / np.timedelta64(1, 's')).astype(float) # Sector 3 recorded time
@@ -117,72 +116,21 @@ def get_data(driver, session):
     
     weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
     weather_rainfall = np.where(weather_rainfall == True, 1, 0)
-    
     weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
- 
+    
+    
+    
     list_of_tuples = list(zip(driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
     df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp'])
     
+    df['Driver'] = driver
+    df['Grand Prix'] = session.event['Location'] # Location for the input session
+    
+    df = df.reindex(columns=['Driver', 'Grand Prix'] + df.columns.tolist()[:-2])
     return df     
 
-def generate_df(race_list):
-    '''
-    race_list è una lista con i nomi di tutta le gare --> race_list = ['Imola', 'Monza', ...]
-    final_df = pd.DataFrame(columns = ['Driver, Race, le stesse colonne di get_data()'])
-    
-    for race_name in race_list:
-        session = ff1.get_session(2022, race_name, 'R')
-        driver_list = lista dei driver che hanno participato alla session. 
-        
-        for driver in driver_list: 
-            data = get_data(driver, session)
-            
-            A data bisogna aggiungere due colonne all'inizio chiamate driver e race contenenti tante copie quante
-            righe ha data tutte uguali con valore il nome del driver e race attuale.
-            
-            - creare un df nuovo con lo stesso numero di righe di data e due colonne, driver e race a valore costante. 
-            - data = pd.Concatenazione_Orizzonatale(df, data)
-            
-            sempre dentro il ciclo di driver, bisogna concatenare in verticale il df data appena aggiornato 
-            con il dataframe finale che viene inizializzato sopra. 
-            
-            final_df = pd.Concatenazione_Verticale(final_df, data)         
-    return final_df       
-    '''
-    
-    # final_df = pd.DataFrame()    
-    # for race_name in race_list:
-    #     session = ff1.get_session(2022, race_name, 'R')
-    #     session.load()
-    #     driver_list = pd.unique(session.laps['Driver']) # Array of all drivers
-
-    #     for driver in driver_list:
-    #         data = get_data(driver, session)
-
-    #         tmp_df = pd.DataFrame(index = data.index, columns = ['Driver', 'Race'])
-    #         tmp_df['Driver'] = driver 
-    #         tmp_df['Race'] = race_name   
-            
-    #         data = pd.concat([data, tmp_df], axis = 1)         
-            
-    #         final_df = pd.concat([final_df, data], ignore_index=True)
-                
-    # columns = final_df.columns.tolist()
-    # columns.remove('Driver')
-    # columns.remove('Race')
-    
-    # final_df = final_df[['Driver', 'Race'] + columns]
-    
-    # if final_df.empty:
-    #     print("final_df is empty. Returning None")
-    #     return None
-    # else:
-    #     final_array = final_df.values
-    #     final_array = final_array.reshape(-1, len(driver_list), len(race_list), len(columns))
-    
-    # print(final_array.ndim)
-    # return final_array
-    
+# Generate three dimensional array. 
+def generate_array(race_list):    
     driver_race_data = {}
     for race_name in race_list:
         session = ff1.get_session(2022, race_name, 'R')
