@@ -2,6 +2,7 @@ import fastf1 as ff1
 import pandas as pd
 import numpy as np
 import xarray as xr
+from sklearn.preprocessing import LabelEncoder
 from datetime import datetime, timedelta
 
 # Function returns all lap times for each lap for each driver
@@ -117,9 +118,7 @@ def get_data(driver, session):
     weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
     weather_rainfall = np.where(weather_rainfall == True, 1, 0)
     weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
-    
-    
-    
+       
     list_of_tuples = list(zip(driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
     df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp'])
     
@@ -129,16 +128,46 @@ def get_data(driver, session):
     df = df.reindex(columns=['Driver', 'Grand Prix'] + df.columns.tolist()[:-2])
     return df     
 
+# # Integer encoder
+# encoder = LabelEncoder()
+# encoder.fit(driver_race_data) # Fit the encoder on your data
+# encoded_array = encoder.transform(driver_race_data) # Trasform the data using the fitted encoder
+
 # Generate three dimensional array. 
 def generate_array(race_list):    
     driver_race_data = {}
+        
     for race_name in race_list:
         session = ff1.get_session(2022, race_name, 'R')
         session.load()
         driver_list = pd.unique(session.laps['Driver'])
-        
         for driver in driver_list:
             data = get_data(driver, session)
+            shape = data.values.shape
+            
+            if shape[0] < data['Lap']:
+                data.values = np.pad(data.values, [(0, data['Lap'] - shape[0]), (0,0)], mode = 'constant')
+            
             driver_race_data[(driver, race_name)] = data.values
 
-    return driver_race_data
+    drivers = list(set([key[0] for key in driver_race_data.keys()]))
+    grand_prix = list(set([key[1] for key in driver_race_data.keys()]))
+
+    # Create label encoders for drivers and grand_prix
+    le_driver = LabelEncoder()
+    le_grand_prix = LabelEncoder()
+
+    # Fit label encoders on unique values
+    le_driver.fit(drivers)
+    le_grand_prix.fit(grand_prix)
+
+    # Create new dictionary with encoded keys
+    encoded_driver_race_data = {}
+
+    for key, value in driver_race_data.items():
+        encoded_key = (le_driver.transform([key[0]])[0], le_grand_prix.transform([key[1]])[0])
+        encoded_value = np.hstack((le_driver.transform([key[0]])[:, np.newaxis], 
+                                le_grand_prix.transform([key[1]])[:, np.newaxis], value))
+        encoded_driver_race_data[encoded_key] = encoded_value
+
+    return encoded_driver_race_data
