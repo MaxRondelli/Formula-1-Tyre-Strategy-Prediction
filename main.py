@@ -32,17 +32,12 @@ ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 
 # #print(df.to_markdown())
 
-# One-hot encode the categorical columns
-# df_encoded = pd.get_dummies(df)
-
-# Convert the encoded dataframe to a NumPy Array
-# array = df_encoded.to_numpy()
     
 '''
 lanciare nel main genearete_df sulla lista dei tracciati (tutti) e salvare output con la libreria pandas. (save.csv)
 '''
 grand_prix_list = ff1.get_event_schedule(2022)
-race_list = ['Imola'] #grand_prix_list['Location']
+race_list = ['Imola', 'Monza'] #grand_prix_list['Location']
 array = generate_array(race_list)
 
 print(array)
