@@ -1,9 +1,6 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
-import xarray as xr
-from sklearn.preprocessing import LabelEncoder
-from datetime import datetime, timedelta
 
 # Function returns all lap times for each lap for each driver
 def get_lap_times(session):
@@ -130,30 +127,34 @@ def get_data(driver, session):
 # Generate three dimensional array. 
 def generate_array(race_list):    
     driver_race_data = {}
+    driver_encoding = {}
+    race_encoding = {}
     
-    # Create LabelEncoder objects for drivers and grand prix
-    driver_encoder = LabelEncoder()
-    race_encoder = LabelEncoder()
+    driver_count = 0
+    race_count = 0
     
     for race_name in race_list:
         session = ff1.get_session(2022, race_name, 'R')
         session.load()
         driver_list = pd.unique(session.laps['Driver'])
         
-        # Encode driver and grand prix names
-        driver_encoder.fit(driver_list)
-        race_encoder.fit([race_name])
-        
         for driver in driver_list:
+            if driver not in driver_encoding:
+                driver_encoding[driver] = driver_count
+                driver_count += 1
+            
+            if race_name not in race_encoding:
+                race_encoding[race_name] = race_count
+                race_count += 1
+        
             data = get_data(driver, session)
             
-            driver_encoded = driver_encoder.transform([driver])[0]
-            race_encoded = race_encoder.transform([race_name])[0]
+            driver_encoded = driver_encoding[driver]
+            race_encoded = race_encoding[race_name]
             
             data['Driver'] = data['Driver'].replace(driver, driver_encoded)
             data['Race'] = data['Race'].replace(race_name, race_encoded)
             
-            # Use encoded driver and grand prix names in tuple
             driver_race_data[(driver_encoded, race_encoded)] = data.values
             
     return driver_race_data
