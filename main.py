@@ -1,15 +1,16 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
+import dict_data
+import pickle
 from utils import *
 
 # Enable the cache
 ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 
-# session = ff1.get_session(2022, 'Austria', 'R')
+# session = ff1.get_session(2022, 'Imola', 'R')
 # driver = 'VER'
 # total_lap = 63 # That's our temporal resolution T. It's effective lenght of one unit of time.
-
 # session.load()
 
 # # Lap features
@@ -21,7 +22,6 @@ ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 # tyre_life = laps_driver['TyreLife'] # Laps driven on this tyre. It includes laps in other session for used sets of tyre.
 # compound = laps_driver['Compound'] # Tyre compound (SOFT, MEDIUM, HARD, INTERMEDIATE, WET)
 # stint = laps_driver['Stint'] # Stint number
-
 # # Weather conditions features
 # weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
 # weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
@@ -32,12 +32,11 @@ ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 
 # #print(df.to_markdown())
 
-    
-'''
-lanciare nel main genearete_df sulla lista dei tracciati (tutti) e salvare output con la libreria pandas. (save.csv)
-'''
-grand_prix_list = ff1.get_event_schedule(2022)
-race_list = ['Imola', 'Monza'] #grand_prix_list['Location']
+# grand_prix_list = ff1.get_event_schedule(2022)
+race_list = ['Imola'] # grand_prix_list['Location']
 array = generate_array(race_list)
+
+# with open('dataset.pickle', 'wb') as f:
+#     pickle.dump(array, f)
 
 print(array)

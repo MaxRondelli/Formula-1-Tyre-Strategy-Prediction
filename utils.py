@@ -1,7 +1,7 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
-
+import dict_data
 # Function returns all lap times for each lap for each driver
 def get_lap_times(session):
     lap_time_data_dict = [] # Create a list of dictionaries
@@ -119,8 +119,11 @@ def get_data(driver, session):
     driver_list = [driver] * len(driver_lap_number)
     grand_prix_list = [session.event['Location']] * len(driver_lap_number)   
     
-    list_of_tuples = list(zip(driver_list, grand_prix_list, driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature))
-    df = pd.DataFrame(list_of_tuples, columns = ['Driver', 'Race', 'Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp']) 
+    # Aggiungere compound in integer
+    compound = session_driver['Compound']
+    
+    list_of_tuples = list(zip(driver_list, grand_prix_list, driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature, compound))
+    df = pd.DataFrame(list_of_tuples, columns = ['Driver', 'Race', 'Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp', 'Compound']) 
     
     return df     
 
@@ -129,9 +132,7 @@ def generate_array(race_list):
     driver_race_data = {}
     driver_encoding = {}
     race_encoding = {}
-    
-    driver_count = 0
-    race_count = 0
+    compound_encoding = {}
     
     for race_name in race_list:
         session = ff1.get_session(2022, race_name, 'R')
@@ -139,22 +140,27 @@ def generate_array(race_list):
         driver_list = pd.unique(session.laps['Driver'])
         
         for driver in driver_list:
-            if driver not in driver_encoding:
-                driver_encoding[driver] = driver_count
-                driver_count += 1
-            
-            if race_name not in race_encoding:
-                race_encoding[race_name] = race_count
-                race_count += 1
-        
             data = get_data(driver, session)
             
+            # Encode and replace driver data.
+            driver_encoding[driver] = dict_data.drivers[driver]
             driver_encoded = driver_encoding[driver]
-            race_encoded = race_encoding[race_name]
-            
             data['Driver'] = data['Driver'].replace(driver, driver_encoded)
+            
+            # Encode and replace race data.
+            race_encoding[race_name] = dict_data.races[race_name]
+            race_encoded = race_encoding[race_name]
             data['Race'] = data['Race'].replace(race_name, race_encoded)
             
-            driver_race_data[(driver_encoded, race_encoded)] = data.values
+            session_driver = session.laps.pick_driver(driver)
+            compound_list = session_driver['Compound']
+            
+            for compound in compound_list:
+                # Encode and replace compound data.
+                compound_encoding[compound] = dict_data.compound[compound]
+                compound_encoded = compound_encoding[compound]
+                data['Compound'] = data['Compound'].replace(compound, compound_encoded)
+                        
+                driver_race_data[(driver_encoded, race_encoded)] = data.values
             
     return driver_race_data
