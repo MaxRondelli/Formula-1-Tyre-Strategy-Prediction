@@ -141,6 +141,7 @@ def generate_array(race_list):
         
         for driver in driver_list:
             data = get_data(driver, session)
+            session_driver = session.laps.pick_driver(driver)
             
             # Encode and replace driver data.
             driver_encoding[driver] = dict_data.drivers[driver]
@@ -152,15 +153,20 @@ def generate_array(race_list):
             race_encoded = race_encoding[race_name]
             data['Race'] = data['Race'].replace(race_name, race_encoded)
             
-            session_driver = session.laps.pick_driver(driver)
-            compound_list = session_driver['Compound']
+            # Compound's driver data from fastf1 library. 
+            compound_list = session_driver['Compound']  
             
             for compound in compound_list:
                 # Encode and replace compound data.
                 compound_encoding[compound] = dict_data.compound[compound]
                 compound_encoded = compound_encoding[compound]
-                data['Compound'] = data['Compound'].replace(compound, compound_encoded)
-                        
-                driver_race_data[(driver_encoded, race_encoded)] = data.values
-            
-    return driver_race_data
+                data['Compound'] = data['Compound'].replace(compound, compound_encoded) 
+               
+                driver_race_data[(driver_encoded, race_encoded)] = data.values   
+                
+                # Add rows until lap is equal to 78 (Monaco's grand prix lap). 
+                while(driver_race_data[(driver_encoded, race_encoded)].shape[0] < 78):
+                    lap = driver_race_data[(driver_encoded, race_encoded)].shape[0] + 1
+                    new_row = np.array([[driver_encoded, race_encoded, lap, -1, -1, -1, -1, -1, -1, -1]])
+                    driver_race_data[(driver_encoded, race_encoded)] = np.vstack((driver_race_data[(driver_encoded, race_encoded)], new_row))            
+    return driver_race_data  
