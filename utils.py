@@ -128,7 +128,7 @@ def get_data(driver, session):
     return df     
 
 # Generate three dimensional array. 
-def generate_array(race_list):    
+def populate_dataset(race_list):    
     driver_race_data = {}
     driver_encoding = {}
     race_encoding = {}
@@ -169,4 +169,21 @@ def generate_array(race_list):
                     lap = driver_race_data[(driver_encoded, race_encoded)].shape[0] + 1
                     new_row = np.array([[driver_encoded, race_encoded, lap, -1, -1, -1, -1, -1, -1, -1]])
                     driver_race_data[(driver_encoded, race_encoded)] = np.vstack((driver_race_data[(driver_encoded, race_encoded)], new_row))            
+
+        # Replace NaN values with -1
+        for key, value in driver_race_data.items():
+            driver_race_data[key] = np.nan_to_num(value, nan = -1)
+    
     return driver_race_data  
+
+def generate_dataset(race_list):
+    dataset = populate_dataset(race_list)
+    return dataset
+    # m, n = dataset[0].shape
+    # N = len(dataset)
+    # data = np.zeros((N, m, n)) # Initialize final dataset
+    
+    # for i in range(N):
+    #     data[i, :, :] = dataset[i]
+    
+    # np.save('data.npy', data) 
