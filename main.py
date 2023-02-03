@@ -4,20 +4,18 @@ import numpy as np
 import dict_data
 import pickle
 from utils import *
-
-# Enable the cache
-ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
-
+from LSTM import *
+import sys 
 # session = ff1.get_session(2022, 'Imola', 'R')
 # driver = 'VER'
-# total_lap = 63 # That's our temporal resolution T. It's effective lenght of one unit of time.
+# # total_lap = 63 # That's our temporal resolution T. It's effective lenght of one unit of time.
 # session.load()
 
-# # Lap features
+# # # Lap features
 # laps_driver = session.laps.pick_driver(driver) 
-# lap_time = laps_driver['LapTime'] # Session time when the lap was set (End of lap) for the specific driver. 
+# # lap_time = laps_driver['LapTime'] # Session time when the lap was set (End of lap) for the specific driver. 
 # lap_numbers = laps_driver['LapNumber'] # Driver's lap
-
+# print(len(lap_numbers))
 # # Tyre features
 # tyre_life = laps_driver['TyreLife'] # Laps driven on this tyre. It includes laps in other session for used sets of tyre.
 # compound = laps_driver['Compound'] # Tyre compound (SOFT, MEDIUM, HARD, INTERMEDIATE, WET)
@@ -32,11 +30,14 @@ ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
 
 # #print(df.to_markdown())
 
-# grand_prix_list = ff1.get_event_schedule(2022)
-race_list = ['Imola'] # grand_prix_list['Location']
-array = generate_array(race_list)
-
 # with open('dataset.pickle', 'wb') as f:
 #     pickle.dump(array, f)
 
-print(array)
+ff1.Cache.enable_cache('Cache')
+race_list = ['Imola']
+np.set_printoptions(threshold=sys.maxsize)
+
+x = generate_dataset(race_list)
+
+print(x.ndim)
+print(x)

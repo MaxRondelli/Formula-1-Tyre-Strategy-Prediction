@@ -102,7 +102,7 @@ def get_compound_for_time(session, t):
             
     return f"Driver: {driver} - Compound: {best_compound}"
 
-
+# Function creates a df for a specific driver and session. 
 def get_data(driver, session):
     session_driver = session.laps.pick_driver(driver)
     
@@ -119,7 +119,6 @@ def get_data(driver, session):
     driver_list = [driver] * len(driver_lap_number)
     grand_prix_list = [session.event['Location']] * len(driver_lap_number)   
     
-    # Aggiungere compound in integer
     compound = session_driver['Compound']
     
     list_of_tuples = list(zip(driver_list, grand_prix_list, driver_lap_number, driver_sector1_time, driver_sector2_time, driver_sector3_time, driver_lap_time, weather_rainfall, weather_track_temperature, compound))
@@ -178,12 +177,16 @@ def populate_dataset(race_list):
 
 def generate_dataset(race_list):
     dataset = populate_dataset(race_list)
-    return dataset
-    # m, n = dataset[0].shape
-    # N = len(dataset)
-    # data = np.zeros((N, m, n)) # Initialize final dataset
+
+    # Concatenate just the dataset's values
     
-    # for i in range(N):
-    #     data[i, :, :] = dataset[i]
+    tmp_array = next(iter(dataset.values()))
+    m, n = tmp_array.shape
+    N = len(dataset)
+    data = np.zeros((N, m, n)) # Initialize final dataset
     
-    # np.save('data.npy', data) 
+    for i, key in enumerate(dataset.keys()):
+        data[i, :, :] = dataset[key]
+    
+    np.save('data.npy', data) 
+    return data
