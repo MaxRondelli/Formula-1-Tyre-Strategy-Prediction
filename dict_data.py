@@ -17,10 +17,11 @@ drivers = {"VER": 0,
           "VET": 16,
           "SAI": 17,
           "LAT": 18,
-          "PER": 19
+          "PER": 19,
+          "DEV": 20
           }
 
-races = {"Bahrain": 0, 
+races = {"Sakhir": 0, 
          "Jeddah": 1,
          "Melbourne": 2,
          "Imola": 3,
