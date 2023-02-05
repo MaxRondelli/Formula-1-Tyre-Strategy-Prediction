@@ -102,6 +102,18 @@ def get_compound_for_time(session, t):
             
     return f"Driver: {driver} - Compound: {best_compound}"
 
+def get_race_list():
+    grand_prix_list = ff1.get_event_schedule(2022)
+    race_list = []
+    for race in grand_prix_list['Location']:
+        race_list.append(race)
+
+    # Removing Pre-season sessions.
+    race_list.remove('Spain')
+    race_list.remove('Bahrain')
+
+    return race_list
+
 # Function creates a df for a specific driver and session. 
 def get_data(driver, session):
     session_driver = session.laps.pick_driver(driver)
@@ -125,6 +137,7 @@ def get_data(driver, session):
     df = pd.DataFrame(list_of_tuples, columns = ['Driver', 'Race', 'Lap', 'Sector 1 Time', 'Sector 2 Time', 'Sector 3 Time', 'Lap Time', 'Rainfall', 'Track Temp', 'Compound']) 
     
     return df     
+
 
 # Generate three dimensional array. 
 def populate_dataset(race_list):    
@@ -178,8 +191,7 @@ def populate_dataset(race_list):
 def generate_dataset(race_list):
     dataset = populate_dataset(race_list)
 
-    # Concatenate just the dataset's values
-    
+    # Concatenate just the dataset's values   
     tmp_array = next(iter(dataset.values()))
     m, n = tmp_array.shape
     N = len(dataset)

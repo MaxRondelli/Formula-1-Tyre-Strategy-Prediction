@@ -34,10 +34,11 @@ import sys
 #     pickle.dump(array, f)
 
 ff1.Cache.enable_cache('Cache')
-race_list = ['Imola']
+
+race_list = get_race_list()
 np.set_printoptions(threshold=sys.maxsize)
 
 x = generate_dataset(race_list)
 
-print(x.ndim)
+# print(x.shape)
 print(x)
