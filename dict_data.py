@@ -18,7 +18,8 @@ drivers = {"VER": 0,
           "SAI": 17,
           "LAT": 18,
           "PER": 19,
-          "DEV": 20
+          "DEV": 20,
+          "HUL": 21
           }
 
 races = {"Sakhir": 0, 
