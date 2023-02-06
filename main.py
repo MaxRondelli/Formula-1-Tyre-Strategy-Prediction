@@ -10,7 +10,6 @@ import sys
 # Enable fastf1 cache
 ff1.Cache.enable_cache('Cache')
 
-
 # session = ff1.get_session(2022, 'Imola', 'R')
 # driver = 'VER'
 # # total_lap = 63 # That's our temporal resolution T. It's effective lenght of one unit of time.
@@ -28,11 +27,9 @@ ff1.Cache.enable_cache('Cache')
 # # Weather conditions features
 # weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
 # weather_track_temperature = session.laps.get_weather_data()['TrackTemp'] # Track temperature [°C]
-
 # # Create DataFrame
 # list_of_tuples = list(zip(lap_numbers, lap_time, compound, tyre_life , stint, weather_rainfall, weather_track_temperature))
 # df = pd.DataFrame(list_of_tuples, columns = ['Lap', 'Time', 'Compound', 'Tyre Life', 'Stint', 'Rainfall', 'Track Temp'])
-
 # #print(df.to_markdown())
 
 # with open('dataset.pickle', 'wb') as f:
@@ -46,6 +43,4 @@ def get_numpy_dataset():
 
     return x
 
-#print(x_train.shape[1:])
-# print(x_train[20])
 
