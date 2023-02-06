@@ -1,30 +1,50 @@
-import fastf1 as ff1
 import tensorflow as tf
 from tensorflow import keras
 from keras.layers import LSTM, Dropout, Dense
+from keras.models import Sequential 
 from utils import *
+from sklearn.model_selection import train_test_split
+import sys 
 
-# Enable the cache
-# ff1.Cache.enable_cache('Cache') # The argument is the name of the folder.
+np.set_printoptions(threshold=sys.maxsize)
 
-# def load_data():
-#     # grand_prix_list = ff1.get_event_schedule(2022)
-#     race_list = ['Imola'] # grand_prix_list['Location']
-#     x = populate_dataset(race_list)
-#     return x 
-#     # dataset = generate_dataset(race_list)
-#     # np.save('data.npy', dataset)
-#     #return dataset
+dataset = np.load('data.npy')
+target = np.zeros(dataset.shape[0])
 
-# data = load_data()
+# test size is a fraction of the data, 20%
+# random parameter determines the random number generator used to split the data
+x_train, x_test, y_train, y_test = train_test_split(dataset, target, test_size=0.2, random_state=42)
 
+# print(x_train.shape)
+# print(x_test.shape)
+# print(y_train.shape)
+# print(y_test.shape)
 
+model = Sequential()
 
-# model = keras.Sequential()
-# model.add(LSTM(100, input_shape = (10, 28)))
-# model.add(Dropout(0.5))
-# model.add(Dense(1, activation="sigmoid"))
-# model.compile(loss="binary_crossentropy",
-#               metrics=[keras.metrics.binary_accuracy],
-#               optimizer="adam")
-# model.summary()
+model.add(LSTM(128, input_shape = (x_train.shape[1:]), activation = 'relu', return_sequences = True))
+model.add(Dropout(0.2))
+
+model.add(LSTM(128, activation = 'relu'))
+model.add(Dropout(0.2))
+
+model.add(Dense(32, activation = 'relu'))
+model.add(Dropout(0.2))
+
+model.add(Dense(10, activation = 'softmax'))
+
+opt = tf.keras.optimizers.Adam(lr = 1e-3, decay = 1e-5)
+
+model.compile(loss = 'sparse_categorical_crossentropy', 
+              optimizer = opt, 
+              metrics = ['accuracy'])
+      
+# Train the model
+model.fit(x_train, y_train, epochs = 50, validation_data = (x_test, y_test))
+
+score = model.evaluate(x_test, y_test, verbose=0)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
+
+# Save the model
+model.save('lstm_model.h5')
