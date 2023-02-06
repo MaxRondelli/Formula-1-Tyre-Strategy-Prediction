@@ -6,6 +6,11 @@ import pickle
 from utils import *
 from LSTM import *
 import sys 
+
+# Enable fastf1 cache
+ff1.Cache.enable_cache('Cache')
+
+
 # session = ff1.get_session(2022, 'Imola', 'R')
 # driver = 'VER'
 # # total_lap = 63 # That's our temporal resolution T. It's effective lenght of one unit of time.
@@ -33,12 +38,14 @@ import sys
 # with open('dataset.pickle', 'wb') as f:
 #     pickle.dump(array, f)
 
-ff1.Cache.enable_cache('Cache')
+def get_numpy_dataset():
+    race_list = get_race_list()
+    np.set_printoptions(threshold=sys.maxsize)
 
-race_list = get_race_list()
-np.set_printoptions(threshold=sys.maxsize)
+    x = generate_dataset(race_list)
 
-x = generate_dataset(race_list)
+    return x
 
-# print(x.shape)
-print(x)
+#print(x_train.shape[1:])
+# print(x_train[20])
+
