@@ -4,6 +4,8 @@ from keras.layers import GRU, Dropout, Dense
 from keras.models import Sequential 
 from utils import *
 import sys 
+from keras.callbacks import ModelCheckpoint, EarlyStopping
+from TimeHistory import TimeHistory 
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -33,10 +35,6 @@ model.add(GRU(128, input_shape = (x_train.shape[1:]), activation = 'relu', retur
 model.add(Dropout(0.2))
 
 model.add(GRU(128, activation = 'relu', return_sequences = True))
-# model.add(Dropout(0.2))
-
-# model.add(LSTM(128, activation = 'relu', return_sequences = True))
-# model.add(Dropout(0.2))
 
 model.add(GRU(5, input_shape = (x_train.shape[1:]), activation = 'softmax', return_sequences = True))
 
@@ -47,8 +45,14 @@ model.compile(loss = 'mse',
               metrics = ['accuracy'])
       
 print(model.summary())
+
+# Checkpoint and early stop
+checkpoint = ModelCheckpoint("model_weight_gru.h5", save_best_only=True, save_weights_only=True, monitor='loss', mode='min', verbose=1)
+early_stop = EarlyStopping(monitor='loss', patience=5, mode='min', verbose=1)
+
 # Train the model
-model.fit(x_train, y_train, epochs = 1000, shuffle = False)
+time_callback = TimeHistory()
+model.fit(x_train, y_train, epochs = 10, shuffle = False, callbacks=[checkpoint, early_stop, time_callback])
 
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
