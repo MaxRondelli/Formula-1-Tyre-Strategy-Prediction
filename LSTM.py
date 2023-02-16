@@ -52,7 +52,7 @@ model.compile(loss = 'mse',
               metrics = ['accuracy'])
       
 # Checkpoint and early stop
-checkpoint = ModelCheckpoint("model_weight.h5", save_best_only=True, save_weights_only=True, monitor='loss', mode='min', verbose=1)
+checkpoint = ModelCheckpoint("model_weight_lstm.h5", save_best_only=True, save_weights_only=True, monitor='loss', mode='min', verbose=1)
 early_stop = EarlyStopping(monitor='loss', patience=5, mode='min', verbose=1)
 
 # Train the model
