@@ -19,7 +19,11 @@ drivers = {"VER": 0,
           "LAT": 18,
           "PER": 19,
           "DEV": 20,
-          "HUL": 21
+          "HUL": 21,
+          "GIO": 22,
+          "RAI": 23,
+          "MAZ": 24,
+          "KUB": 25
           }
 
 races = {"Sakhir": 0, 
@@ -32,7 +36,7 @@ races = {"Sakhir": 0,
          "Baku": 7,
          "Montréal": 8,
          "Silverstone": 9,
-         "Spielberg": 10,
+         "Spielberg0": 10,
          "Le Castellet": 11,
          "Budapest": 12,
          "Spa-Francorchamps": 13,
@@ -43,7 +47,15 @@ races = {"Sakhir": 0,
          "Austin": 18,
          "Mexico City": 19,
          "São Paulo": 20,
-         "Yas Island": 21
+         "Yas Island": 21,
+         "Portimão": 22,
+         "Montmeló": 23,
+         "Monte-Carlo": 24,
+         "Spa": 13,
+         "Sochi": 26,
+         "Istanbul": 27,
+         "Al Daayen": 28,
+         "Spielberg1": 29,
          }
 
 compound = {"SOFT": 0,
