@@ -48,7 +48,6 @@ def get_race_list(year):
         race_list.remove('Sakhir')
                
     return race_list
-
 # Function creates a df for a specific driver and session. 
 def get_data(driver, session):
     session_driver = session.laps.pick_driver(driver)
@@ -57,7 +56,7 @@ def get_data(driver, session):
     driver_sector1_time = (session_driver['Sector1Time'] / np.timedelta64(1, 's')).astype(float) # Sector 1 recorded time
     driver_sector2_time = (session_driver['Sector2Time'] / np.timedelta64(1, 's')).astype(float) # Sector 2 recorded time
     driver_sector3_time = (session_driver['Sector3Time'] / np.timedelta64(1, 's')).astype(float) # Sector 3 recorded time
-    driver_lap_time = (pd.to_timedelta(session_driver['LapTime']) / np.timedelta64(1, 's')).astype(float)
+    driver_lap_time = (pd.to_timedelta(session_driver['LapTime']) / pd.to_timedelta(1, unit='s')).astype(float)
     
     weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
     weather_rainfall = np.where(weather_rainfall == True, 1, 0)
@@ -79,7 +78,7 @@ def populate_dataset(race_list, year):
     driver_encoding = {}
     race_encoding = {}
     compound_encoding = {}
-    
+        
     for race_name in race_list:
         session = ff1.get_session(year, race_name, 'R')
         session.load()
@@ -123,7 +122,7 @@ def populate_dataset(race_list, year):
     return driver_race_data  
 
 def generate_dataset(race_list, year):
-    
+
     if year == 2021:
         # -------------------- 2021 data --------------------
         dataset_2021 = populate_dataset(race_list, year)
@@ -133,9 +132,12 @@ def generate_dataset(race_list, year):
         m, n = tmp_array.shape
         N = len(dataset_2021)
         data_2021 = np.zeros((N, m, n)) # Initialize final dataset
-        
+
         for i, key in enumerate(dataset_2021.keys()):
             data_2021[i, :, :] = dataset_2021[key]
+            
+        data_2022 = np.zeros((0, m, n)) # Initialize empty array of same shape as data_2021
+    
     elif year == 2022:
         # -------------------- 2022 data --------------------
         dataset_2022 = populate_dataset(race_list, year)
@@ -145,12 +147,13 @@ def generate_dataset(race_list, year):
         m, n = tmp_array.shape
         N = len(dataset_2022)
         data_2022 = np.zeros((N, m, n)) # Initialize final dataset
-        
+
         for i, key in enumerate(dataset_2022.keys()):
             data_2022[i, :, :] = dataset_2022[key]
-        
-    
-    data = np.concatenate((data_2022, data_2021), axis = 0)
+
+        data_2021 = np.zeros((0, m, n)) # Initialize empty array of same shape as data_2021
+
+    data = np.concatenate((data_2021, data_2022), axis = 0)
     
     np.save('data1.npy', data) 
     return data
@@ -250,9 +253,9 @@ def dataframe(session, driver):
     
     race = [session.event['Location']] * len(driver_lap_number)   
     
-    list_of_tuples = list(zip(race, air_temperature, humidity, pressure, rainfall, track_temperature, wind_direction, wind_speed))
+    list_of_tuples = list(zip(race, driver_lap_number, air_temperature, humidity, pressure, rainfall, track_temperature, wind_direction, wind_speed))
     
-    df = pd.DataFrame(list_of_tuples, columns = ['Race', 'Air Temperature', 'Humidity', 
+    df = pd.DataFrame(list_of_tuples, columns = ['Race', 'Lap', 'Air Temperature', 'Humidity', 
                                                  'Pressure', 'Rainfall', 'Track Temperature', 'Wind Direction', 
                                                  'Wind Speed'])
     
