@@ -36,7 +36,7 @@ races = {"Sakhir": 0,
          "Baku": 7,
          "Montréal": 8,
          "Silverstone": 9,
-         "Spielberg0": 10,
+         "Spielberg": 10,
          "Le Castellet": 11,
          "Budapest": 12,
          "Spa-Francorchamps": 13,
@@ -56,6 +56,8 @@ races = {"Sakhir": 0,
          "Istanbul": 27,
          "Al Daayen": 28,
          "Spielberg1": 29,
+         "Abu Dhabi": 30,
+         "Spain": 31
          }
 
 compound = {"SOFT": 0,
