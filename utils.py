@@ -3,53 +3,8 @@ import pandas as pd
 import numpy as np
 import dict_data
 
-# # Function returns all data for one specific driver at one time t.
-# def get_driver_data_for_time(lap_data_dict, driver, t):
-#     driver_data_t = []  
-    
-#     for entry in lap_data_dict:
-#         if entry['driver'] == driver:
-#             if entry['lap'] == t:
-#                 driver_data_t.append(entry)
-    
-#     return driver_data_t    
-
-# # Function returns all data for one specific given driver.
-# def get_driver_data(lap_data_dict, driver):  
-#     get_driver_data = []
-     
-#     for entry in lap_data_dict:
-#         if(driver == entry['driver']):
-#             driver = entry['driver']
-    
-#     for entry in lap_data_dict:
-#         if entry.get('driver') == driver:
-#             get_driver_data.append(entry)
-    
-#     return get_driver_data
-
-def get_race_list(year_list):
-    race_list = []
-    for year in year_list:
-        grand_prix_list = ff1.get_event_schedule(year)
-    
-        count = 0
-        for race in grand_prix_list['Location']:
-            if year == 2021 and race == 'Spielberg':
-                race = race + str(count)
-                count += 1
-            
-            race_list.append(race)
-
-        # Removing Pre-season test sessions.
-        if year == 2022:
-            race_list.remove('Spain')
-            race_list.remove('Bahrain')
-        elif year == 2021:
-            race_list.remove('Sakhir')         
-        
-                              
-    return race_list
+def timedelta_to_seconds(td):
+    return td / np.timedelta64(1, 's')
 
 # Function creates a df for a specific driver and session. 
 def get_data(driver, session):
@@ -59,7 +14,7 @@ def get_data(driver, session):
     driver_sector1_time = (session_driver['Sector1Time'] / np.timedelta64(1, 's')).astype(float) # Sector 1 recorded time
     driver_sector2_time = (session_driver['Sector2Time'] / np.timedelta64(1, 's')).astype(float) # Sector 2 recorded time
     driver_sector3_time = (session_driver['Sector3Time'] / np.timedelta64(1, 's')).astype(float) # Sector 3 recorded time
-    driver_lap_time = session_driver['LapTime']
+    driver_lap_time = session_driver['LapTime'].apply(timedelta_to_seconds)
     
     weather_rainfall = session.laps.get_weather_data()['Rainfall'] # Shows if there is rainfall
     weather_rainfall = np.where(weather_rainfall == True, 1, 0)
@@ -75,77 +30,98 @@ def get_data(driver, session):
     
     return df     
 
-# Generate three dimensional array. 
-def populate_dataset(race_list, year):    
+def get_race_list(year):
+    grand_prix_list = ff1.get_event_schedule(year)
+    race_list = []
+                     
+    for race in grand_prix_list['Location']:
+        race_list.append(race)  
+            
+    # Removing Pre-season test sessions.
+    if year == 2022:
+        race_list.remove('Spain')
+        race_list.remove('Bahrain')
+    elif year == 2021:
+        race_list.remove('Sakhir')  
+        
+    return race_list
+        
+def load_dataset(year_list):
     driver_race_data = {}
     driver_encoding = {}
     race_encoding = {}
     compound_encoding = {}
-        
-    for race_name in race_list:
-        session = ff1.get_session(year, race_name, 'R')
-        session.load()
-        driver_list = pd.unique(session.laps['Driver'])
-        
-        for driver in driver_list:
-            data = get_data(driver, session)
-            session_driver = session.laps.pick_driver(driver)
-            
-            # Encode and replace driver data.
-            driver_encoding[driver] = dict_data.drivers[driver]
-            driver_encoded = driver_encoding[driver]
-            data['Driver'] = data['Driver'].replace(driver, driver_encoded)
-            
-            # Encode and replace race data.
-            race_encoding[race_name] = dict_data.races[race_name]
-            race_encoded = race_encoding[race_name]
-            data['Race'] = data['Race'].replace(race_name, race_encoded)
-            
-            # Compound's driver data from fastf1 library. 
-            compound_list = session_driver['Compound']  
-            
-            for compound in compound_list:
-                # Encode and replace compound data.
-                compound_encoding[compound] = dict_data.compound.get(compound, -1)
-                compound_encoded = compound_encoding[compound]
-                data['Compound'] = data['Compound'].replace(compound, compound_encoded) 
-               
-                driver_race_data[(driver_encoded, race_encoded)] = data.values   
-                
-                # Add rows until lap is equal to 78 (Monaco's grand prix lap). 
-                while(driver_race_data[(driver_encoded, race_encoded)].shape[0] < 78):
-                    lap = driver_race_data[(driver_encoded, race_encoded)].shape[0] + 1
-                    new_row = np.array([[driver_encoded, race_encoded, lap, -1, -1, -1, -1, -1, -1, -1]])
-                    driver_race_data[(driver_encoded, race_encoded)] = np.vstack((driver_race_data[(driver_encoded, race_encoded)], new_row))            
 
+    for year in year_list:
+        # Get the race list for the input year
+        race_list = get_race_list(year) 
+             
+        for race in race_list:
+            session = ff1.get_session(year, race, 'R')
+            session.load()
+            driver_list = pd.unique(session.laps['Driver'])
+
+            for driver in driver_list:
+                session_driver = session.laps.pick_driver(driver)
+                
+                # Load all the driver's information for the current session
+                data = get_data(driver, session)
+
+                # Encode and replace driver data.
+                driver_encoding[driver] = dict_data.drivers[driver]
+                driver_encoded = driver_encoding[driver]
+                data['Driver'] = data['Driver'].replace(driver, driver_encoded)
+                
+                # Encode and replace race data.
+                race_encoding[race] = dict_data.races[race]
+                race_encoded = race_encoding[race]
+                data['Race'] = data['Race'].replace(race, race_encoded)
+                
+                # Compound's driver data from fastf1 library. 
+                compound_list = session_driver['Compound']
+                
+                for compound in compound_list:
+                    
+                    # Encode and replace compound data.
+                    compound_encoding[compound] = dict_data.compound.get(compound, -1)
+                    compound_encoded = compound_encoding[compound]
+                    data['Compound'] = data['Compound'].replace(compound, compound_encoded) 
+                
+                    driver_race_data[(driver_encoded, race_encoded)] = data.values   
+                    
+                    # Add rows until lap is equal to 78 (Monaco's grand prix lap). 
+                    while(driver_race_data[(driver_encoded, race_encoded)].shape[0] < 78):
+                        lap = driver_race_data[(driver_encoded, race_encoded)].shape[0] + 1
+                        new_row = np.array([[driver_encoded, race_encoded, lap, -1, -1, -1, -1, -1, -1, -1]])
+                        driver_race_data[(driver_encoded, race_encoded)] = np.vstack(
+                            (driver_race_data[(driver_encoded, race_encoded)], new_row))
+        
         # Replace NaN values with -1
         for key, value in driver_race_data.items():
             driver_race_data[key] = np.nan_to_num(value, nan = -1)
-    
-    return driver_race_data  
 
-def generate_dataset(race_list, year_list):
+    return driver_race_data
 
-    data_list = []   
-    
-    for year in year_list:
-        dataset = populate_dataset(race_list, year)
-        
-        # Concatenate just the dataset's values   
-        tmp_array = next(iter(dataset.values()))
-        m, n = tmp_array.shape
-        N = len(dataset)
-        data = np.zeros((N, m, n)) # Initialize final dataset
+def generate_dataset(year_list):
 
-        for i, key in enumerate(dataset.keys()):
-            data[i, :, :] = dataset[key]
-        
-        data_list.append(data)
+    dataset = load_dataset(year_list)
     
-    data = np.concatenate(data_list, axis = 0)
+    # Replace NaN values with -1
+    for key, value in dataset.items():
+        dataset[key] = np.nan_to_num(value, nan = -1)
+
+    # Create 3D numpy array. Concatenate just the dataset's values 
+    tmp_array = next(iter(dataset.values()))
+    m, n = tmp_array.shape
+    N = len(dataset)
+    data = np.zeros((N, m, n)) # Initialize final dataset
+
+    for i, key in enumerate(dataset.keys()):
+        data[i, :, :] = dataset[key]     
     
-    np.save('data1.npy', data) 
+    np.save('data2.npy', data) 
     return data
+
 
 # Function returns all lap times for each lap for each driver
 def get_lap_times(session):
@@ -249,7 +225,6 @@ def dataframe(session, driver):
                                                  'Wind Speed'])
     
     return df 
-
 def dataset(race_list, year):
     race_data = {}
     
@@ -267,92 +242,3 @@ def dataset(race_list, year):
         
                
         
-def get_race_list(year):
-    grand_prix_list = ff1.get_event_schedule(year)
-    race_list = []
-                     
-    for race in grand_prix_list['Location']:
-        race_list.append(race)  
-            
-    # Removing Pre-season test sessions.
-    if year == 2022:
-        race_list.remove('Spain')
-        race_list.remove('Bahrain')
-    elif year == 2021:
-        race_list.remove('Sakhir')  
-        
-    return race_list
-        
-def load_dataset(year_list):
-    driver_race_data = {}
-    driver_encoding = {}
-    race_encoding = {}
-    compound_encoding = {}
-    data_list = []   
-
-    for year in year_list:
-        # Get the race list for the input year
-        race_list = get_race_list(year) 
-             
-        for race in race_list:
-            session = ff1.get_session(year, race, 'R')
-            session.load()
-            driver_list = pd.unique(session.laps['Driver'])
-
-            for driver in driver_list:
-                session_driver = session.laps.pick_driver(driver)
-                
-                # Load all the driver's information for the current session
-                data = get_data(driver, session)
-
-                # Encode and replace driver data.
-                driver_encoding[driver] = dict_data.drivers[driver]
-                driver_encoded = driver_encoding[driver]
-                data['Driver'] = data['Driver'].replace(driver, driver_encoded)
-                
-                # Encode and replace race data.
-                race_encoding[race] = dict_data.races[race]
-                race_encoded = race_encoding[race]
-                data['Race'] = data['Race'].replace(race, race_encoded)
-                
-                # Compound's driver data from fastf1 library. 
-                compound_list = session_driver['Compound']
-                
-                for compound in compound_list:
-                    
-                    # Encode and replace compound data.
-                    compound_encoding[compound] = dict_data.compound.get(compound, -1)
-                    compound_encoded = compound_encoding[compound]
-                    data['Compound'] = data['Compound'].replace(compound, compound_encoded) 
-                
-                    driver_race_data[(driver_encoded, race_encoded)] = data.values   
-                    
-                    # Add rows until lap is equal to 78 (Monaco's grand prix lap). 
-                    while(driver_race_data[(driver_encoded, race_encoded)].shape[0] < 78):
-                        lap = driver_race_data[(driver_encoded, race_encoded)].shape[0] + 1
-                        new_row = np.array([[driver_encoded, race_encoded, lap, -1, -1, -1, -1, -1, -1, -1]])
-                        driver_race_data[(driver_encoded, race_encoded)] = np.vstack(
-                            (driver_race_data[(driver_encoded, race_encoded)], new_row))
-        
-        # Replace NaN values with -1
-        for key, value in driver_race_data.items():
-            driver_race_data[key] = np.nan_to_num(value, nan = -1)
-
-    return driver_race_data
-        
-
-
-def generate_dataset(driver_race_data):
-    # Create 3D numpy array. Concatenate just the dataset's values 
-    tmp_array = next(iter(driver_race_data.values()))
-    m, n = tmp_array.shape
-    N = len(driver_race_data)
-    data = np.zeros((N, m, n)) # Initialize final dataset
-
-    for i, key in enumerate(driver_race_data.keys()):
-        data[i, :, :] = driver_race_data[key]
-    
-    data_list.append(data)
-    
-    np.save('data1.npy', data_list) 
-    return data_list
