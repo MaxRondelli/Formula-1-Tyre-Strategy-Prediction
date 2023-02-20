@@ -47,7 +47,7 @@ def get_race_list(year):
     return race_list
         
 def load_dataset(year_list):
-    driver_race_data = {}
+    driver_race_data_list = []
     driver_encoding = {}
     race_encoding = {}
     compound_encoding = {}
@@ -55,7 +55,9 @@ def load_dataset(year_list):
     for year in year_list:
         # Get the race list for the input year
         race_list = get_race_list(year) 
-             
+
+        driver_race_data = {}
+
         for race in race_list:
             session = ff1.get_session(year, race, 'R')
             session.load()
@@ -63,7 +65,7 @@ def load_dataset(year_list):
 
             for driver in driver_list:
                 session_driver = session.laps.pick_driver(driver)
-                
+
                 # Load all the driver's information for the current session
                 data = get_data(driver, session)
 
@@ -71,56 +73,63 @@ def load_dataset(year_list):
                 driver_encoding[driver] = dict_data.drivers[driver]
                 driver_encoded = driver_encoding[driver]
                 data['Driver'] = data['Driver'].replace(driver, driver_encoded)
-                
+
                 # Encode and replace race data.
                 race_encoding[race] = dict_data.races[race]
                 race_encoded = race_encoding[race]
                 data['Race'] = data['Race'].replace(race, race_encoded)
-                
+
                 # Compound's driver data from fastf1 library. 
                 compound_list = session_driver['Compound']
-                
+
                 for compound in compound_list:
-                    
+
                     # Encode and replace compound data.
                     compound_encoding[compound] = dict_data.compound.get(compound, -1)
                     compound_encoded = compound_encoding[compound]
                     data['Compound'] = data['Compound'].replace(compound, compound_encoded) 
-                
+
                     driver_race_data[(driver_encoded, race_encoded)] = data.values   
-                    
+
                     # Add rows until lap is equal to 78 (Monaco's grand prix lap). 
                     while(driver_race_data[(driver_encoded, race_encoded)].shape[0] < 78):
                         lap = driver_race_data[(driver_encoded, race_encoded)].shape[0] + 1
                         new_row = np.array([[driver_encoded, race_encoded, lap, -1, -1, -1, -1, -1, -1, -1]])
                         driver_race_data[(driver_encoded, race_encoded)] = np.vstack(
                             (driver_race_data[(driver_encoded, race_encoded)], new_row))
-        
+
         # Replace NaN values with -1
         for key, value in driver_race_data.items():
-            driver_race_data[key] = np.nan_to_num(value, nan = -1)
+            driver_race_data[key] = np.nan_to_num(value, nan=-1)
 
-    return driver_race_data
+        driver_race_data_list.append(driver_race_data)
+
+    return driver_race_data_list
+
 
 def generate_dataset(year_list):
 
-    dataset = load_dataset(year_list)
-    
-    # Replace NaN values with -1
-    for key, value in dataset.items():
-        dataset[key] = np.nan_to_num(value, nan = -1)
+    driver_race_data_list = load_dataset(year_list)
 
-    # Create 3D numpy array. Concatenate just the dataset's values 
-    tmp_array = next(iter(dataset.values()))
-    m, n = tmp_array.shape
-    N = len(dataset)
-    data = np.zeros((N, m, n)) # Initialize final dataset
+    # Determine the shape of the 3D numpy array
+    m, n = next(iter(driver_race_data_list[0].values())).shape
+    N = sum(len(d) for d in driver_race_data_list)
+    full_dataset = np.zeros((N, m, n))
 
-    for i, key in enumerate(dataset.keys()):
-        data[i, :, :] = dataset[key]     
-    
-    np.save('data2.npy', data) 
-    return data
+    # Convert each dictionary to a 3D numpy array and stack them
+    i = 0
+    for dataset in driver_race_data_list:
+        for key, value in dataset.items():
+            full_dataset[i] = value
+            i += 1
+
+    # Save the full dataset to a file
+    np.save('data_prova.npy', full_dataset)
+
+    return full_dataset
+
+
+
 
 
 # Function returns all lap times for each lap for each driver
