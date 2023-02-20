@@ -55,7 +55,6 @@ races = {"Sakhir": 0,
          "Sochi": 26,
          "Istanbul": 27,
          "Al Daayen": 28,
-         "Spielberg1": 29,
          "Abu Dhabi": 30,
          "Spain": 31
          }
