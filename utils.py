@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import dict_data
 
+#------------------------------------- First experiment -------------------------------------
 def timedelta_to_seconds(td):
     return td / np.timedelta64(1, 's')
 
@@ -54,7 +55,7 @@ def load_dataset(year_list):
 
     for year in year_list:
         # Get the race list for the input year
-        race_list = get_race_list(year) 
+        race_list = ['Imola'] #get_race_list(year) 
 
         driver_race_data = {}
 
@@ -106,7 +107,6 @@ def load_dataset(year_list):
 
     return driver_race_data_list
 
-
 def generate_dataset(year_list):
 
     driver_race_data_list = load_dataset(year_list)
@@ -124,13 +124,11 @@ def generate_dataset(year_list):
             i += 1
 
     # Save the full dataset to a file
-    np.save('data_prova.npy', full_dataset)
+    np.save('ex1_data.npy', full_dataset)
 
     return full_dataset
 
-
-
-
+#------------------------------------- Second Experiment -------------------------------------
 
 # Function returns all lap times for each lap for each driver
 def get_lap_times(session):
@@ -154,6 +152,7 @@ def get_lap_times(session):
             count = count + 1 
                     
     return lap_time_data_dict
+
 # Function selects data on driver lap times at time t from the full lap time data. It returns information for all driver at the specific lap t. 
 def get_data_for_time(lap_data_dict, t):
     data_t = [] # Empty list to store the selected data
@@ -163,8 +162,12 @@ def get_data_for_time(lap_data_dict, t):
             data_t.append(entry)
             
     return data_t
+
 # Function choose driver with the best lap time among those available at t time, using the lap time data provided as input.
 def get_best_driver(lap_data_dict):
+    if not lap_data_dict:
+        return None
+    
     best_driver = lap_data_dict[0]['driver']
     best_lap_time = lap_data_dict[0]['lap_time']
 
@@ -175,6 +178,7 @@ def get_best_driver(lap_data_dict):
             best_driver = entry['driver']
             
     return best_driver
+
 # Function returns the driver with the best lap time at time t, based on available data on driver lap times.  
 def get_best_driver_for_time(session, t):
     # Load data on driver lap times.
@@ -187,6 +191,7 @@ def get_best_driver_for_time(session, t):
     best_driver = get_best_driver(data_t)
     
     return best_driver
+
 # Function returns the compound of the driver how had the best time at t time. 
 def get_compound_for_time(session, t):   
     driver = get_best_driver_for_time(session, t)  
@@ -194,60 +199,118 @@ def get_compound_for_time(session, t):
     session_driver = session.laps.pick_driver(driver)
     compound = session_driver['Compound']
     
-    best_compound = 0 
+    best_compound = None 
     
     # It gets the compound at t time. 
     for i, entry in enumerate(compound):
         if i == t:
             best_compound = entry
             
-    print = f"Driver: {driver} - Compound: {best_compound}"
+    #print = f"Driver: {driver} - Compound: {best_compound}"
     return best_compound
 
-'''
-Creare nuovo dataset che fissata la gare e un anno ha per colonne:
-    input: gli ripetiamo la gara e anno, lap, tutte le informazioni che non dipendono dal pilota (weather conditions etc.), life time del compound 
-    output: ultima colonna, il compound migliore per quel giro e per quella gara
-    
-    (Imola, 2022) = [[Imola, 2022, 1, .........., 'soft']]
-'''
 # Dataset for final experiment: best tyre prediction
-def dataframe(session, driver):
-    session_driver = session.laps.pick_driver(driver)
-    driver_lap_number = session_driver['LapNumber']
+# Get information for a specific race and year. 
+def get_information(session, race, year):
+    # Get lap number for the race
+    lap = dict_data.laps[race]
     
     # Weather conditions data
     air_temperature = session.laps.get_weather_data()['AirTemp']
     humidity = session.laps.get_weather_data()['Humidity']
     pressure = session.laps.get_weather_data()['Pressure']
     rainfall = session.laps.get_weather_data()['Rainfall']
+    rainfall = np.where(rainfall == True, 1, 0)
+
     track_temperature = session.laps.get_weather_data()['TrackTemp']
     wind_direction = session.laps.get_weather_data()['WindDirection']
     wind_speed = session.laps.get_weather_data()['WindSpeed']
     
-    race = [session.event['Location']] * len(driver_lap_number)   
+    year_list = [year] * lap
+    race = [session.event['Location']] * lap   
     
-    list_of_tuples = list(zip(race, driver_lap_number, air_temperature, humidity, pressure, rainfall, track_temperature, wind_direction, wind_speed))
+    lap_list = []
+    for i in range(lap):
+        lap_list.append(i)
     
-    df = pd.DataFrame(list_of_tuples, columns = ['Race', 'Lap', 'Air Temperature', 'Humidity', 
+    list_of_tuples = list(zip(race, year_list, lap_list, air_temperature, humidity, pressure, rainfall, track_temperature, wind_direction, wind_speed))
+    
+    df = pd.DataFrame(list_of_tuples, columns = ['Race', 'Year', 'Lap', 'Air Temperature', 'Humidity', 
                                                  'Pressure', 'Rainfall', 'Track Temperature', 'Wind Direction', 
                                                  'Wind Speed'])
     
     return df 
-def dataset(race_list, year):
-    race_data = {}
-    
-    for race in race_list:
-        session = ff1.get_session(year, race, 'R')
-        session.load()
-        driver_list = pd.unique(session.laps['Driver'])
 
-        for driver in driver_list:
-            data = dataframe(session, driver)
+def populate_dataset(year_list):
+    np.set_printoptions(formatter={'float': lambda x: format(x, '.1f')}) # Output format
+
+    dataset = []
+    race_encoding = {}
+    compound_encoding = dict_data.compound
+
+    for year in year_list:
+        # Get the race list for the current year
+        race_list = ['Imola', 'Monza'] #get_race_list(year)
+        
+        dataset_data = {}
+        
+        for race in race_list:
+            session = ff1.get_session(year, race, 'R')
+            session.load()     
             
-            race_data[(race, year)] = data.values
+            # Get driver's information for the current session
+            driver_information = get_information(session, race, year)
+            
+            # Encode and replace race data
+            race_encoding[race] = dict_data.races[race]
+            race_encoded = race_encoding[race]
+            driver_information['Race'] = driver_information['Race'].replace(race, race_encoded)
+            
+            # Initialize lap data array for current race and year
+            lap_data_array = np.full((len(driver_information['Lap']), 11), -1, dtype=np.float32)
+
+            for i, lap in enumerate(driver_information['Lap']):
+                lap_data = list(driver_information.loc[driver_information['Lap'] == lap].values[0])
+                target = get_compound_for_time(session, lap) # Best compound at each lap
+                
+                if target is not None:
+                    compound_encoded = compound_encoding[target] # Encoding the compound from string to integer
+                else: 
+                    compound_encoded = -1 
+                    
+                lap_data.append(compound_encoded)
+                lap_data_array[i,:] = lap_data
+
+            dataset_data[(race_encoded, year)] = lap_data_array
+            
+            while dataset_data[(race_encoded, year)].shape[0] < 78:
+                lap = dataset_data[(race_encoded, year)].shape[0] + 1
+                new_row = np.array([[race_encoded, year, lap, -1, -1, -1, -1, -1, -1, -1, -1]])
+                dataset_data[(race_encoded, year)] = np.vstack((dataset_data[(race_encoded, year)], new_row))
+    
+        dataset.append(dataset_data)
         
-    return race_data
-        
-               
-        
+    return dataset
+
+# Returns a 3D numpy array
+def get_dataset(year_list):
+    
+    dataset_dict = populate_dataset(year_list)
+    
+    # Determine the shape of the 3D numpy array
+    m, n = next(iter(dataset_dict[0].values())).shape
+    N = sum(len(d) for d in dataset_dict)
+    full_dataset = np.zeros((N, m, n))
+
+    # Convert each dictionary to a 3D numpy array and stack them
+    i = 0
+    for dataset in dataset_dict:
+        for key, value in dataset.items():
+            full_dataset[i] = value
+            i += 1
+
+
+    # Save the full dataset to a file
+    np.save('exp2_data.npy', full_dataset)
+
+    return full_dataset
