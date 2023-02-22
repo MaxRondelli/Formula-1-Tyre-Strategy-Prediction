@@ -1,36 +1,37 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
-import dict_data
-import pickle
 from utils import *
 from LSTM import *
-import sys 
 
 # Enable fastf1 cache
 ff1.Cache.enable_cache('Cache')
 
-# session = ff1.get_session(2021, 'Zandvoort', 'R')
-# driver = 'VER'
+#--------------- Generate .npy file for the first experiment ---------------
+# year_list = [2022]
+# x = load_dataset(year_list)
+# print(x)
+
+#--------------- Generate .npy file for the second experiment ---------------
+# session = ff1.get_session(2019, 'Imola', 'R')
 # session.load()
-# laps_driver = session.laps.pick_driver(driver) 
-# compound = laps_driver['Compound'] # Tyre compound (SOFT, MEDIUM, HARD, INTERMEDIATE, WET)
+# driver = 'HAM'
 
-# df = pd.DataFrame(compound, columns = ['Compound'])
-# print(df.to_markdown())
+# driver_session = session.laps.pick_driver(driver)
+# compound = driver_session['Compound']
+# print(compound)
+# driver_list = pd.unique(session.laps['Driver'])
+# print(driver_list)
 
-# with open('dataset.pickle', 'wb') as f:
-#     pickle.dump(array, f)
+# year_list = [2019, 2020, 2021, 2022]
+# # for year in year_list:
+# #     df = get_information(session, driver, year)
+# #     print(df.to_markdown())
+    
+# x = get_dataset(year_list)
+# print(x)
 
+# # grand_prix_list = ff1.get_event_schedule(2020)
+# # print(grand_prix_list)
 
-year_list = [2021, 2022]
-x = generate_dataset(year_list)
-print(x)
-
-# print(get_race_list(2021))
-# grand_prix_list = ff1.get_event_schedule(2021)
-# print(grand_prix_list['Location'])
-
-# race_list = get_race_list(2021)
-# dataset = dataset(race_list, 2021)
-# print(dataset)
+# print(get_race_list(2020))
