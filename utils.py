@@ -42,9 +42,47 @@ def get_race_list(year):
     if year == 2022:
         race_list.remove('Spain')
         race_list.remove('Bahrain')
-    elif year == 2021:
-        race_list.remove('Sakhir')  
         
+    elif year == 2021:
+        race_list.remove('Sakhir') 
+        
+        # count = 0 
+        # for i, race in enumerate(race_list):
+        #     if race == 'Spielberg':
+        #         count_str = str(count)
+        #         new_race = str(race+count_str)
+    
+        #         race_list.insert(i, new_race)
+        #         race_list.remove(race)
+        #         count += 1             
+    elif year == 2020:
+        race_list.remove('Montmeló')    
+        race_list.remove('Montmeló')    
+
+        # count = 0 
+        # for i, race in enumerate(race_list):
+        #     if race == 'Spielberg':
+        #         count_str = str(count)
+        #         new_race = str(race+count_str)
+    
+        #         race_list.insert(i, new_race)
+        #         race_list.remove(race)
+        #         count += 1
+        #     elif race == 'Silverstone':
+        #         count_str = str(count)
+        #         new_race = str(race+count_str)
+    
+        #         race_list.insert(i, new_race)
+        #         race_list.remove(race)
+        #         count += 1
+        #     elif race == 'Sakhir':
+        #         count_str = str(count)
+        #         new_race = str(race+count_str)
+    
+        #         race_list.insert(i, new_race)
+        #         race_list.remove(race)
+        #         count += 1
+
     return race_list
         
 def load_dataset(year_list):
@@ -250,7 +288,7 @@ def populate_dataset(year_list):
 
     for year in year_list:
         # Get the race list for the current year
-        race_list = ['Imola', 'Monza'] #get_race_list(year)
+        race_list = get_race_list(year)
         
         dataset_data = {}
         
@@ -275,6 +313,8 @@ def populate_dataset(year_list):
                 
                 if target is not None:
                     compound_encoded = compound_encoding[target] # Encoding the compound from string to integer
+                elif target is np.NaN:
+                    compound_encoded = -1
                 else: 
                     compound_encoded = -1 
                     
@@ -311,6 +351,6 @@ def get_dataset(year_list):
 
 
     # Save the full dataset to a file
-    np.save('exp2_data.npy', full_dataset)
+    np.save('exp2_final_data.npy', full_dataset)
 
     return full_dataset
