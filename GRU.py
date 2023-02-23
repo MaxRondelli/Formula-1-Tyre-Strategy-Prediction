@@ -40,6 +40,8 @@ model.add(GRU(128, activation = 'relu', return_sequences = True))
 
 model.add(GRU(128, activation = 'relu', return_sequences = True))
 
+model.add(GRU(128, activation = 'relu', return_sequences = True))
+
 # ------------- Output layer -------------
 model.add(GRU(5, input_shape = (x_train.shape[1:]), activation = 'softmax', return_sequences = True))
 
@@ -53,13 +55,14 @@ model.compile(loss = 'mse',
 # checkpoint = ModelCheckpoint("model_weight_gru.h5", save_best_only=True, save_weights_only=True, monitor='loss', mode='min', verbose=1)
 # early_stop = EarlyStopping(monitor='loss', patience=5, mode='min', verbose=1)
 
+time_callback = TimeHistory() # calculate total training time
+
 # Train the model
-time_callback = TimeHistory()
-model.fit(x_train, y_train, epochs = 1000, shuffle = False)#, callbacks=[checkpoint, early_stop, time_callback])
+model.fit(x_train, y_train, epochs = 3000, shuffle = False, callbacks=[time_callback]) #, checkpoint, early_stop, ])
 
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 # Save the model
-model.save('gru_final_epochs()_acc()_loss()_lr()_hl().h5')
+model.save('GRU Models/gru_final_epochs()_acc()_loss()_lr()_hl().h5')

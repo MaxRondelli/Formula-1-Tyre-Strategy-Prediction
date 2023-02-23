@@ -72,11 +72,12 @@ early_stop = EarlyStopping(monitor='loss', patience=10, mode='min', verbose=1)
 
 # Train the model
 time_callback = TimeHistory()
-model.fit(x_train, y_train, epochs = 1000, shuffle = False) #, callbacks=[checkpoint, early_stop, time_callback])
+model.fit(x_train, y_train, epochs = 1, shuffle = False, callbacks=[time_callback]) #, callbacks=[checkpoint, early_stop])
 
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Random classificator:', random_classificator)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
 # Save the model
-model.save('lstm_final_epochs()_acc()_loss()_lr().h5')
+model.save('LSTM Models/lstm_final_epochs()_acc()_loss()_lr().h5')
