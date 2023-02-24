@@ -54,13 +54,13 @@ model.add(LSTM(128, activation = 'relu', return_sequences = True))
 # model.add(Dropout(0.2))
 model.add(LSTM(128, activation = 'relu', return_sequences = True))
 
-# model.add(LSTM(128, activation = 'relu', return_sequences = True))
+model.add(LSTM(128, activation = 'relu', return_sequences = True))
 # model.add(Dropout(0.2))
 
 # ------------- Output layer -------------
 model.add(LSTM(5, input_shape = (x_train.shape[1:]), activation = 'softmax', return_sequences = True))
 
-opt = tf.keras.optimizers.Adam(learning_rate = 5e-7)
+opt = tf.keras.optimizers.Adam(learning_rate = 5e-4)
 
 model.compile(loss = 'mse', 
               optimizer = opt, 
@@ -68,11 +68,11 @@ model.compile(loss = 'mse',
       
 # Checkpoint and early stop
 checkpoint = ModelCheckpoint("model_weight_lstm.h5", save_best_only=True, save_weights_only=True, monitor='loss', mode='min', verbose=1)
-early_stop = EarlyStopping(monitor='loss', patience=10, mode='min', verbose=1)
+early_stop = EarlyStopping(monitor='loss', patience=400, mode='min', verbose=1)
 
 # Train the model
 time_callback = TimeHistory()
-model.fit(x_train, y_train, epochs = 1, shuffle = False, callbacks=[time_callback]) #, callbacks=[checkpoint, early_stop])
+model.fit(x_train, y_train, epochs = 2000, shuffle = False, callbacks=[time_callback, checkpoint, early_stop]) 
 
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Random classificator:', random_classificator)
@@ -80,4 +80,4 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
 # Save the model
-model.save('LSTM Models/lstm_final_epochs()_acc()_loss()_lr().h5')
+model.save('LSTM Models/lstm_final_epochs()_acc()_loss()_lr().hl().h5')
