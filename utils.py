@@ -45,43 +45,10 @@ def get_race_list(year):
         
     elif year == 2021:
         race_list.remove('Sakhir') 
-        
-        # count = 0 
-        # for i, race in enumerate(race_list):
-        #     if race == 'Spielberg':
-        #         count_str = str(count)
-        #         new_race = str(race+count_str)
-    
-        #         race_list.insert(i, new_race)
-        #         race_list.remove(race)
-        #         count += 1             
+      
     elif year == 2020:
         race_list.remove('Montmeló')    
-        race_list.remove('Montmeló')    
-
-        # count = 0 
-        # for i, race in enumerate(race_list):
-        #     if race == 'Spielberg':
-        #         count_str = str(count)
-        #         new_race = str(race+count_str)
-    
-        #         race_list.insert(i, new_race)
-        #         race_list.remove(race)
-        #         count += 1
-        #     elif race == 'Silverstone':
-        #         count_str = str(count)
-        #         new_race = str(race+count_str)
-    
-        #         race_list.insert(i, new_race)
-        #         race_list.remove(race)
-        #         count += 1
-        #     elif race == 'Sakhir':
-        #         count_str = str(count)
-        #         new_race = str(race+count_str)
-    
-        #         race_list.insert(i, new_race)
-        #         race_list.remove(race)
-        #         count += 1
+        race_list.remove('Montmeló')   
 
     return race_list
         
@@ -93,7 +60,7 @@ def load_dataset(year_list):
 
     for year in year_list:
         # Get the race list for the input year
-        race_list = ['Imola'] #get_race_list(year) 
+        race_list = get_race_list(year) 
 
         driver_race_data = {}
 
@@ -354,3 +321,7 @@ def get_dataset(year_list):
     np.save('exp2_final_data.npy', full_dataset)
 
     return full_dataset
+
+# 2d numpy array (78*78, 11) --> MLP 
+# 1. se MLP va meglio, la colpa è dei dati. Avendo piu dati va meglio
+# 2. se MLP va peggio, la natura ricorrente ha piu senso in questo exp.
