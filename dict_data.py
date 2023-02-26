@@ -23,7 +23,13 @@ drivers = {"VER": 0,
           "GIO": 22,
           "RAI": 23,
           "MAZ": 24,
-          "KUB": 25
+          "KUB": 25,
+          "KVY": 26,
+          "GRO": 27,
+          "SIR": 28,
+          "VAN": 29,
+          "ERI": 30,
+          "HAR": 31    
           }
 
 races = {"Sakhir": 0, 
@@ -56,14 +62,25 @@ races = {"Sakhir": 0,
          "Istanbul": 27,
          "Al Daayen": 28,
          "Abu Dhabi": 30,
-         "Spain": 31
+         "Spain": 31,
+         "Mugello": 32,
+         "Nürburg": 33,
+         "Shanghai": 34,
+         "Hockenheim": 35,
+         "Montreal": 36,
+         "Spielberg0": 37,
+         "Spielberg1": 38,
+         'Silverstone2': 39, 
+         'Silverstone3': 40,
+         "Sakhir4": 41,
+         "Sakhir5": 42
          }
 
 compound = {"SOFT": 0,
             "MEDIUM": 1,
             "HARD": 2,
             "INTERMEDIATE": 3,
-            "WET": 4
+            "WET": 4,
             }
 
 laps = {"Sakhir": 57, 
@@ -96,4 +113,15 @@ laps = {"Sakhir": 57,
          "Istanbul": 58 ,
          "Al Daayen": 57,
          "Abu Dhabi": 58,
+         "Mugello": 59,
+         "Nürburg": 60,
+         "Shanghai": 56,
+         "Hockenheim": 67,
+         "Montreal": 70,
+         "Spielberg0": 71,
+         "Spielberg1": 71,
+         'Silverstone2': 52, 
+         'Silverstone3': 52,
+         "Sakhir4": 57,
+         "Sakhir5": 57
          }
