@@ -30,12 +30,16 @@ def train_split(X, y, p):
     return (x_train, y_train), (x_test, y_test)
 
 (x_train, y_train), (x_test, y_test) = train_split(X, y, 0.8)
+y_train = tf.keras.utils.to_categorical(y_train, 5)
+y_test = tf.keras.utils.to_categorical(y_test, 5)
 
 # --------------------- Model ---------------------
 model = Sequential()
 
+model.add(Dense(128, activation = 'relu', input_dim = X.shape[-1]))
+model.add(Dense(64, activation='relu'))
 model.add(Dense(64, activation = 'relu', input_dim = X.shape[-1]))
-model.add(Dense(32, activation='relu'))
+
 model.add(Dense(5, activation='softmax'))
 
 model.compile(loss = 'mse', 
@@ -46,9 +50,11 @@ model.compile(loss = 'mse',
 checkpoint = ModelCheckpoint("model_weight_lstm.h5", save_best_only=True, save_weights_only=True, monitor='loss', mode='min', verbose=1)
 early_stop = EarlyStopping(monitor='loss', patience=400, mode='min', verbose=1)
 
+print(y_train.shape)
+
 # Train the model
 time_callback = TimeHistory()
-hist = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 100, shuffle = False, callbacks=[time_callback, checkpoint, early_stop]) 
+hist = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 2000, shuffle = False) #, callbacks=[time_callback, checkpoint, early_stop]) 
 
 plt.figure()
 plt.plot(hist.history["accuracy"])
@@ -58,7 +64,6 @@ plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
 plt.legend(["Training", "Validation"])
 plt.savefig('MLP Plots/mlp_plot_epochs()_acc()_loss().png', dpi = 400)
-
 
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
