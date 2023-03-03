@@ -34,4 +34,4 @@ A blind classifier has been calculated to predict the class label of the test da
 The plot below shows the comparision between the blind classfier and the three model analyzed.
 
 
-![alt text](https://github.com/MaxRondelli/Formula-1-Tyre-Strategy-Prediction/Plots/Blind Classifier comparation.png?raw=true)
+![alt text](https://github.com/MaxRondelli/Formula-1-Tyre-Strategy-Prediction/blob/main/Plots/Blind%20Classifier%20comparation.png?raw=true)
