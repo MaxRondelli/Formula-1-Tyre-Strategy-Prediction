@@ -1,7 +1,7 @@
 import fastf1 as ff1
 import pandas as pd
 import numpy as np
-import dict_data
+import Dict_data
 
 #------------------------------------- First experiment -------------------------------------
 def timedelta_to_seconds(td):
@@ -76,12 +76,12 @@ def load_dataset(year_list):
                 data = get_data(driver, session)
 
                 # Encode and replace driver data.
-                driver_encoding[driver] = dict_data.drivers[driver]
+                driver_encoding[driver] = Dict_data.drivers[driver]
                 driver_encoded = driver_encoding[driver]
                 data['Driver'] = data['Driver'].replace(driver, driver_encoded)
 
                 # Encode and replace race data.
-                race_encoding[race] = dict_data.races[race]
+                race_encoding[race] = Dict_data.races[race]
                 race_encoded = race_encoding[race]
                 data['Race'] = data['Race'].replace(race, race_encoded)
 
@@ -91,7 +91,7 @@ def load_dataset(year_list):
                 for compound in compound_list:
 
                     # Encode and replace compound data.
-                    compound_encoding[compound] = dict_data.compound.get(compound, -1)
+                    compound_encoding[compound] = Dict_data.compound.get(compound, -1)
                     compound_encoded = compound_encoding[compound]
                     data['Compound'] = data['Compound'].replace(compound, compound_encoded) 
 
@@ -218,7 +218,7 @@ def get_compound_for_time(session, t):
 # Get information for a specific race and year. 
 def get_information(session, race, year):
     # Get lap number for the race
-    lap = dict_data.laps[race]
+    lap = Dict_data.laps[race]
     
     # Weather conditions data
     air_temperature = session.laps.get_weather_data()['AirTemp']
@@ -251,7 +251,7 @@ def populate_dataset(year_list):
 
     dataset = []
     race_encoding = {}
-    compound_encoding = dict_data.compound
+    compound_encoding = Dict_data.compound
 
     for year in year_list:
         # Get the race list for the current year
@@ -267,7 +267,7 @@ def populate_dataset(year_list):
             driver_information = get_information(session, race, year)
             
             # Encode and replace race data
-            race_encoding[race] = dict_data.races[race]
+            race_encoding[race] = Dict_data.races[race]
             race_encoded = race_encoding[race]
             driver_information['Race'] = driver_information['Race'].replace(race, race_encoded)
             

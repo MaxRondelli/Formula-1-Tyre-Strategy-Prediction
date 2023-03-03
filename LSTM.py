@@ -3,7 +3,7 @@ from tensorflow import keras
 from keras.layers import LSTM, Dropout, Dense
 from keras.models import Sequential
 from TimeHistory import TimeHistory 
-from utils import *
+from Utils import *
 import sys 
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 

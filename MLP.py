@@ -1,7 +1,7 @@
 import tensorflow as tf
 from keras.layers import Dense
 from keras.models import Sequential 
-from utils import *
+from Utils import *
 import sys 
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from TimeHistory import TimeHistory 
