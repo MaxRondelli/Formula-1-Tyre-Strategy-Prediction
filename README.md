@@ -33,5 +33,8 @@ A blind classifier has been calculated to predict the class label of the test da
 
 The plot below shows the comparision between the blind classfier and the three model analyzed.
 
-
 ![alt text](https://github.com/MaxRondelli/Formula-1-Tyre-Strategy-Prediction/blob/main/Plots/Blind%20Classifier%20comparation.png?raw=true)
+
+In conclusion, we have trained and compared the performance of three different models, to predict the best tyre strategy in Formula 1 races. GRU won the races between the other two models, achieving a 51.4% of accuracy, where, in this type of project, it is a great result. 
+
+![alt text](https://github.com/MaxRondelli/Formula-1-Tyre-Strategy-Prediction/blob/main/Plots/Accuracies_losses_models_table.jpg?raw=true)
