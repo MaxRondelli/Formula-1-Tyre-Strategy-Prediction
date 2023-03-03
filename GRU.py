@@ -1,12 +1,10 @@
 import tensorflow as tf
-from tensorflow import keras
-from keras.layers import GRU, Dropout, Dense
+from keras.layers import GRU, Dropout
 from keras.models import Sequential 
 from utils import *
 import sys 
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from TimeHistory import TimeHistory 
-import matplotlib.pyplot as plt 
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -46,7 +44,7 @@ model.add(GRU(128, activation = 'relu', return_sequences = True))
 # ------------- Output layer -------------
 model.add(GRU(5, input_shape = (x_train.shape[1:]), activation = 'softmax', return_sequences = True))
 
-opt = tf.keras.optimizers.Adam(learning_rate = 5e-4)
+opt = tf.keras.optimizers.Adam(learning_rate = 1e-4)
 
 model.compile(loss = 'mse', 
               optimizer = opt, 
@@ -58,18 +56,9 @@ early_stop = EarlyStopping(monitor='loss', patience=400, mode='min', verbose=1)
 
 # Train the model
 time_callback = TimeHistory()
-hist = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 2000, shuffle = False, callbacks=[time_callback, checkpoint, early_stop]) 
+history = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 2000, shuffle = False, callbacks=[time_callback, checkpoint, early_stop]) 
 
-plt.figure()
-plt.plot(hist.history["accuracy"])
-plt.plot(hist.history["val_accuracy"])
-plt.grid()
-plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
-plt.legend(["Training", "Validation"])
-plt.savefig('GRU Plots/gru_plot_epochs()_acc()_loss()_lr().png', dpi = 400)
-
-
+# Model score
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
