@@ -1,12 +1,10 @@
 import tensorflow as tf
-from tensorflow import keras
-from keras.layers import GRU, Dropout, Dense
+from keras.layers import Dense
 from keras.models import Sequential 
 from utils import *
 import sys 
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from TimeHistory import TimeHistory 
-import matplotlib.pyplot as plt 
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -40,6 +38,7 @@ model.add(Dense(128, activation = 'relu', input_dim = X.shape[-1]))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(64, activation = 'relu', input_dim = X.shape[-1]))
 
+# -------- Output layer --------
 model.add(Dense(5, activation='softmax'))
 
 model.compile(loss = 'mse', 
@@ -56,15 +55,7 @@ print(y_train.shape)
 time_callback = TimeHistory()
 hist = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 2000, shuffle = False) #, callbacks=[time_callback, checkpoint, early_stop]) 
 
-plt.figure()
-plt.plot(hist.history["accuracy"])
-plt.plot(hist.history["val_accuracy"])
-plt.grid()
-plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
-plt.legend(["Training", "Validation"])
-plt.savefig('MLP Plots/mlp_plot_epochs()_acc()_loss().png', dpi = 400)
-
+# Model score
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
