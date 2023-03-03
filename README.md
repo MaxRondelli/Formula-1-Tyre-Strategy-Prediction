@@ -24,5 +24,13 @@ ff1.Cache.enable_cache('cache') # the argument is the name of the folder. Be car
 Fastf1 has its [documentation](https://theoehrly.github.io/Fast-F1/), where you can find all its functionality. 
 
 ## Numerical Results
-We observer that GRU consistenly outperformed the LSTM across the learning rates used. Specifically, with a learning rate of 1e−4, the GRU achieved an accuracy of 51.4% and a loss of 11.8%, while the LSTM only achieved an accuracy of 23.8% and a loss of 16%. Similarly, with a learning rate of 5e-4, the GRU achieved an accuracy of 50.4% and a loss of 15.5%, while the LSTM achieved an accuracy of 28.1% and a loss of 15.6%. These results suggest that the GRU is better suited for this particular task than the LSTM.
+We observer that GRU consistenly outperformed the LSTM across the learning rates used. Specifically, with a learning rate of 1e−4, the GRU achieved an accuracy of 51.4% and a loss of 11.8%, while the LSTM only achieved an accuracy of 23.8% and a loss of 16%. 
+Similarly, with a learning rate of 5e-4, the GRU achieved an accuracy of 50.4% and a loss of 15.5%, while the LSTM achieved an accuracy of 28.1% and a loss of 15.6%. These results suggest that the GRU is better suited for this particular task than the LSTM.
+
+GRU model outperformed the MLP model as well, which get an accuracy of 27.1% and a loss of 29.1%. The superior performance of the GRU model can be attributed to its recurrent nature, which allows it to better capture the sequential nature of the data. 
+
+A blind classifier has been calculated to predict the class label of the test data based only on the prior probabilities of the classes in the training data. In our case, the blind classifier accuracy is 24.5%, which means that if you were to randomly guess the class label for each test sample, you would expect to get an accuracy of 24.5%. 
+
+The plot below shows the comparision between the blind classfier and the three model analyzed.
+
 
