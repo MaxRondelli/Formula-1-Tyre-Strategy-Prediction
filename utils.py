@@ -321,7 +321,3 @@ def get_dataset(year_list):
     np.save('exp2_final_data.npy', full_dataset)
 
     return full_dataset
-
-# 2d numpy array (78*78, 11) --> MLP 
-# 1. se MLP va meglio, la colpa è dei dati. Avendo piu dati va meglio
-# 2. se MLP va peggio, la natura ricorrente ha piu senso in questo exp.
