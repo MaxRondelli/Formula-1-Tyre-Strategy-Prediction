@@ -6,17 +6,15 @@ from TimeHistory import TimeHistory
 from utils import *
 import sys 
 from keras.callbacks import ModelCheckpoint, EarlyStopping
-import matplotlib.pyplot as plt 
 
 np.set_printoptions(threshold=sys.maxsize)
 
 dataset = np.load('exp2_final_data.npy')
-print(dataset.shape)
 
 X = dataset[:, :, :-1]
 y = dataset[:, :, -1]
 
-# X = X.reshape((78*78, -1))
+# X = X.reshape((78*78, -1)) # Reshape and flayyen necessary to calculate the blind classifier
 # y = y.flatten()
 
 def train_split(X, y, p):
@@ -36,13 +34,7 @@ y_test = tf.keras.utils.to_categorical(y_test, 5)
 
 # p_i = np.mean(y_train, axis = 0)
 # n_i = np.sum(y_test, axis = 0)
-
 # blind_classifier = np.sum(p_i * n_i) / np.sum(n_i)
-
-'''
-senza nn, l'accaratezza sparando a caso prendi il 25%. sparando a caso significa che con il 14% prevedi soft, 29% prevedi medium etc. 
-sparando a caso prevedi le % nel training set.
-'''
 
 model = Sequential()
 
@@ -61,7 +53,7 @@ model.add(LSTM(128, activation = 'relu', return_sequences = True))
 # ------------- Output layer -------------
 model.add(LSTM(5, input_shape = (x_train.shape[1:]), activation = 'softmax', return_sequences = True))
 
-opt = tf.keras.optimizers.Adam(learning_rate = 1e-4)
+opt = tf.keras.optimizers.Adam(learning_rate = 5e-4)
 # 1e-4 , 5e-4
 model.compile(loss = 'mse', 
               optimizer = opt, 
@@ -73,22 +65,10 @@ early_stop = EarlyStopping(monitor='loss', patience=400, mode='min', verbose=1)
 
 # Train the model
 time_callback = TimeHistory()
-hist = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 2000, shuffle = False, callbacks=[time_callback, checkpoint, early_stop]) 
+history = model.fit(x_train, y_train, validation_data = (x_test, y_test), epochs = 2000, shuffle = False, callbacks=[time_callback, checkpoint, early_stop]) 
 
-plt.figure()
-plt.plot(hist.history["accuracy"])
-plt.plot(hist.history["val_accuracy"])
-plt.grid()
-plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
-plt.legend(["Training", "Validation"])
-plt.savefig('LSTM Plots/lstm_plot_epochs()_acc()_loss()_lr().png', dpi = 400)
-
+# Model score
 score = model.evaluate(x_test, y_test, verbose=0)
-
-# print("p_i:", p_i)
-# print("n_i:", n_i)
-# print('Blind classifier:', blind_classifier)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
