@@ -22,6 +22,12 @@ ff1.Cache.enable_cache('cache') # the argument is the name of the folder. Be car
 ```
 
 Fastf1 has its [documentation](https://theoehrly.github.io/Fast-F1/), where you can find all its functionality. 
+## Experiments
+We conducted two experiemtns. In the first one, we trained a neural network to predict the compound used by drivers during a lap. It is actually a useless prediction since the target is given in the last column of the dataset. It has been done only for learning reasons. Learn how to create a 3D dataset and how to train a neural network.
+
+The second experiment, instead, is the real purpose of the project. The aim is to predict the best tyre for each lap during the race. A metric (best lap time) has been used to decide what "best tyre" means. 
+
+The implementation has been splitted in the code. The datasets are different.
 
 ## Numerical Results
 We observer that GRU consistenly outperformed the LSTM across the learning rates used. Specifically, with a learning rate of 1e−4, the GRU achieved an accuracy of 51.4% and a loss of 11.8%, while the LSTM only achieved an accuracy of 23.8% and a loss of 16%. 
