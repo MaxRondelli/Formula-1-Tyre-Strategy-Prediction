@@ -23,7 +23,7 @@ ff1.Cache.enable_cache('cache') # the argument is the name of the folder. Be car
 
 Fastf1 has its [documentation](https://theoehrly.github.io/Fast-F1/), where you can find all its functionality. 
 ## Experiments
-I conducted two experiments.
+I conducted two experiments:
 
 1. In the first one, I trained a neural network to predict the compound used by drivers during a lap. It is actually a useless prediction since the target is already given in the last column of the dataset. It has been done only for learning reasons. I needed to undestand how to create a 3D dataset and how to train a neural network.
 2. The second experiment, instead, is the real purpose of the project. The aim is to predict the best tyre for each lap during the race. A metric (best lap time) has been used to decide what "best tyre" means. 
