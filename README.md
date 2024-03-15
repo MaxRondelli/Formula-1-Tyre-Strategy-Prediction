@@ -31,7 +31,7 @@ I conducted two experiments:
 The implementation has been splitted in the code. The datasets are different.
 
 ## Numerical Results
-I observer that GRU consistenly outperformed the LSTM across the learning rates used. Specifically, with a learning rate of 1e−4, the GRU achieved an accuracy of 51.4% and a loss of 11.8%, while the LSTM only achieved an accuracy of 23.8% and a loss of 16%. 
+I observec that GRU consistenly outperformed the LSTM across the learning rates used. Specifically, with a learning rate of 1e−4, the GRU achieved an accuracy of 51.4% and a loss of 11.8%, while the LSTM only achieved an accuracy of 23.8% and a loss of 16%. 
 Similarly, with a learning rate of 5e-4, the GRU achieved an accuracy of 50.4% and a loss of 15.5%, while the LSTM achieved an accuracy of 28.1% and a loss of 15.6%. These results suggest that the GRU is better suited for this particular task than the LSTM.
 
 GRU model outperformed the MLP model as well, which get an accuracy of 27.1% and a loss of 29.1%. The superior performance of the GRU model can be attributed to its recurrent nature, which allows it to better capture the sequential nature of the data. 
