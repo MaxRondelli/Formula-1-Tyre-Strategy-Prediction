@@ -1,2 +1,5 @@
 __pycache__/
-Cache
+cache
+MLP plots
+LSTM plots
+GRU plots
