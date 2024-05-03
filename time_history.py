@@ -1,5 +1,5 @@
 import time
-from keras.callbacks import Callback
+from keras.api.callbacks import Callback
 
 class TimeHistory(Callback):
     def on_train_begin(self, logs={}):

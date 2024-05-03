@@ -1,5 +1,5 @@
 import fastf1 as ff1
-from Utils import *
+from utils import *
 
 # Enable fastf1 cache
 ff1.Cache.enable_cache('Cache')

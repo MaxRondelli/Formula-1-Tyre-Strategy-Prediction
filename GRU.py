@@ -1,10 +1,10 @@
 import tensorflow as tf
-from keras.layers import GRU, Dropout
-from keras.models import Sequential 
-from Utils import *
+from keras.api.layers import GRU, Dropout
+from keras.api.models import Sequential 
+from utils import *
 import sys 
-from keras.callbacks import ModelCheckpoint, EarlyStopping
-from TimeHistory import TimeHistory 
+from keras.api.callbacks import ModelCheckpoint, EarlyStopping
+from time_history import TimeHistory 
 
 np.set_printoptions(threshold=sys.maxsize)
 

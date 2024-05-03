@@ -1,11 +1,11 @@
 import tensorflow as tf
 from tensorflow import keras
-from keras.layers import LSTM, Dropout, Dense
-from keras.models import Sequential
-from TimeHistory import TimeHistory 
-from Utils import *
+from keras.api.layers import LSTM, Dropout, Dense
+from keras.api.models import Sequential
+from time_history import TimeHistory 
+from utils import *
 import sys 
-from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.api.callbacks import ModelCheckpoint, EarlyStopping
 
 np.set_printoptions(threshold=sys.maxsize)
 
