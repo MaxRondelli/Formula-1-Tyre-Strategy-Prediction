@@ -8,7 +8,7 @@ from time_history import TimeHistory
 
 np.set_printoptions(threshold=sys.maxsize)
 
-dataset = np.load('exp2_final_data.npy')
+dataset = np.load('dataset/exp2_final_data.npy')
 
 X = dataset[:, :, :-1]
 y = dataset[:, :, -1]

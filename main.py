@@ -2,7 +2,7 @@ import fastf1 as ff1
 from utils import *
 
 # Enable fastf1 cache
-ff1.Cache.enable_cache('Cache')
+ff1.Cache.enable_cache('cache')
 
 #--------------- Generate .npy file for the first experiment ---------------
 year_list = [2021, 2022]
