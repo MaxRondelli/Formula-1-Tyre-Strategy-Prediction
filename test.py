@@ -6,31 +6,12 @@ import csv
 # Enable fastf1 cache
 ff1.Cache.enable_cache('cache')
 
-""" 
-Getting information about weather and track condition are important to predict which tyre is the best at each lap. 
-Recurrent Neural Networks (RNN) are used for this experiment. Times series are the most useful net's for this task. 
-
-LAP | COMPOUND | WEATHER INFORMATIONS
-
-"""
-
 session = ff1.get_session(2023, 'Sakhir', 'R')
 session.load()
-
-print(session.laps.pick_lap(3).pick_fastest()['TyreLife'])
-
 total_laps = session.total_laps # Get total laps for the session
 
 # Lists to store data for DataFrame
-lap_list = []
-compound_list = []
-lap_time_list = []
-lap_data = []
 
-"""
-The value could miss and being nan. It will be replaced as an empty string.
-Return: compound and weather data for a specific fastest lap if available. Otherwise, empty string. 
-"""
 def fastestDriverData(lap):
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="In the future, `None` will be returned instead of an empty `Lap` object")
@@ -51,9 +32,12 @@ def fastestDriverData(lap):
             return ""
 
 def createDataframe(total_laps):
-    # Create an empty list to store lap data
+    # Create an empty list to store data for DataFrame
+    compound_list = []
+    lap_time_list = []
     lap_data = []
-    
+    lap_list = []
+
     # Iterate over laps
     for lap in range(total_laps):
         # Get data using fastestDriverData function
@@ -82,8 +66,6 @@ def createDataframe(total_laps):
     
     # Create DataFrame
     df = pd.DataFrame(lap_data)
-    
-    # Save DataFrame to a text file (CSV format)
-    df.to_csv('lap_data.txt', sep='\t', index=False, quoting=csv.QUOTE_NONE)
+    return df
 
 createDataframe(total_laps)
