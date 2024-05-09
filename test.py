@@ -29,10 +29,7 @@ def fastestDriverData(lap):
 
 def createDataframe(total_laps):
     # Create an empty list to store data for DataFrame
-    compound_list = []
-    lap_time_list = []
     lap_data = []
-    lap_list = []
 
     # Iterate over laps
     for lap in range(total_laps):
@@ -62,7 +59,6 @@ def createDataframe(total_laps):
     
     # Create DataFrame
     df = pd.DataFrame(lap_data)
-    # return df
 
     # Write on txt file
     file_exists = os.path.isfile('lap_data.txt')
@@ -108,15 +104,15 @@ def get_race_list(year):
         race_list.remove('Spain')
         race_list.remove('Bahrain')
     elif year == 2021:
-        race_list.remove('Sakhir') 
+        race_list.remove('Bahrain') 
     elif year == 2020:
-        race_list.remove('Montmeló')    
-        race_list.remove('Montmeló')   
+        race_list.remove('Barcelona')    
+        race_list.remove('Barcelona')   
     elif year == 2023:
         race_list.remove('Sakhir') 
     return race_list
 
-years = [2024]
+years = [2020, 2021, 2022, 2023]
 for year in years:
     race_list = get_race_list(year)
     for race in race_list:
