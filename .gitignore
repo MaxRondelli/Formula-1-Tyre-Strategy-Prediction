@@ -4,3 +4,5 @@ MLP_plots
 LSTM_plots
 GRU_plots
 data
+lap_data.npy
+lap_data.txt
