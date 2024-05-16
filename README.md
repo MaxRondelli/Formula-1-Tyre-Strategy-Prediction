@@ -1,6 +1,4 @@
 # Formula 1 Tyre Strategy Prediction
- 
-## Project Description
 The aim of the project is to develop and implement neural networks algorithms (specifically LSTM, GRU and MLP) to predict tyre strategy during a Formula 1 race.
 
 ## How to get the data
