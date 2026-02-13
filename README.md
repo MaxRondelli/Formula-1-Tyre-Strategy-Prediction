@@ -43,3 +43,20 @@ The plot below shows the comparision between the blind classfier and the three m
 In conclusion, I have trained and compared the performance of three different models, to predict the best tyre strategy in Formula 1 races. GRU won the races between the other two models, achieving a 51.4% of accuracy, where, in this type of project, it is a great result. 
 
 ![alt text](https://github.com/MaxRondelli/Formula-1-Tyre-Strategy-Prediction/blob/main/plots/Accuracies_losses_models_table.jpg?raw=true)
+
+## Citation
+
+If you use this project in your research, please cite the following thesis:
+```bibtex
+@thesis{rondelli2023formula1,
+  author       = {Rondelli, Massimo},
+  title        = {The Future of Formula 1 Racing: Neural Networks to Predict Tyre Strategy},
+  school       = {Università di Bologna},
+  year         = {2023},
+  type         = {Bachelor's Thesis},
+  course       = {Informatica per il Management},
+  supervisor   = {Loli Piccolomini, Elena},
+  cosupervisor = {Evangelista, Davide},
+  url          = {https://amslaurea.unibo.it/id/eprint/27922}
+}
+```
